@@ -1424,7 +1424,7 @@ def api_quality_analysis():
         data = request.get_json()
         analysis_type = data.get('type', 'general')
         
-        # Use local data analysis instead of backend API
+        # Use local data analysis
         df = load_local_dataset()
         if df is None:
             return jsonify({
@@ -1432,16 +1432,53 @@ def api_quality_analysis():
                 'error': 'Dataset not available'
             }), 503
         
-        # Perform quality analysis locally
+        # Calculate quality metrics
+        overall_score = 0
+        completeness_score = calculate_completeness_score(df)
+        accuracy_score = calculate_accuracy_score(df)
+        consistency_score = calculate_consistency_score(df)
+        freshness_score = calculate_freshness_score(df)
+        
+        # Calculate overall score as weighted average
+        weights = {
+            'completeness': 0.35,
+            'accuracy': 0.30,
+            'consistency': 0.20,
+            'freshness': 0.15
+        }
+        
+        overall_score = (
+            completeness_score * weights['completeness'] +
+            accuracy_score * weights['accuracy'] +
+            consistency_score * weights['consistency'] +
+            freshness_score * weights['freshness']
+        )
+        
+        # Count issues
+        issues = identify_data_issues(df)
+        total_issues = len(issues['critical']) + len(issues['warnings']) + len(issues['suggestions'])
+        
+        # Generate quality metrics
+        quality_metrics = calculate_quality_metrics(df)
+        
+        # Generate recommendations based on issues
+        recommendations = generate_recommendations(df, issues, quality_metrics)
+        
         analysis_result = {
             'analysis_type': analysis_type,
-            'data_quality_score': 85.5,
-            'recommendations': [
-                'Improve data completeness for better analysis',
-                'Standardize data formats across all fields',
-                'Implement regular data validation checks'
-            ],
-            'total_records': len(df) if df is not None else 0
+            'overall_score': overall_score,
+            'data_completeness': completeness_score,
+            'data_accuracy': accuracy_score,
+            'data_consistency': consistency_score,
+            'data_freshness': freshness_score,
+            'total_records': len(df),
+            'issues_found': total_issues,
+            'critical_issues': len(issues['critical']),
+            'warnings': len(issues['warnings']),
+            'suggestions': len(issues['suggestions']),
+            'analysis_timestamp': datetime.now().isoformat(),
+            'recommendations': recommendations,
+            'quality_metrics': quality_metrics
         }
         
         # Enhance with AI insights from Gemini
@@ -1927,6 +1964,340 @@ def load_local_dataset():
             return None
     except Exception as e:
         logger.error(f"Error loading local dataset: {e}")
+
+def calculate_completeness_score(df):
+    """Calculate data completeness score"""
+    try:
+        # Calculate percentage of non-null values for each column
+        completeness_by_column = (1 - df.isnull().sum() / len(df)) * 100
+        
+        # Weight certain columns more heavily
+        weights = {
+            'College_Name': 1.0,
+            'NIRF_Rank': 0.8,
+            'AICTE_Approval_Score': 0.8,
+            'UGC_Rating': 0.8,
+            'Placement_Percentage': 0.7,
+            'Faculty_Student_Ratio': 0.7,
+            'Infrastructure_Score': 0.6,
+            'Student_Satisfaction_Score': 0.6
+        }
+        
+        # Calculate weighted average completeness
+        total_weight = sum(weights.get(col, 0.5) for col in df.columns)
+        weighted_completeness = sum(
+            completeness_by_column[col] * weights.get(col, 0.5)
+            for col in df.columns
+        ) / total_weight
+        
+        return round(weighted_completeness, 2)
+        
+    except Exception as e:
+        logger.error(f"Error calculating completeness score: {e}")
+        return 0.0
+
+def calculate_accuracy_score(df):
+    """Calculate data accuracy score based on value ranges and statistical analysis"""
+    try:
+        accuracy_scores = []
+        
+        # Check value ranges
+        if 'AICTE_Approval_Score' in df.columns:
+            valid_aicte = ((df['AICTE_Approval_Score'] >= 0) & (df['AICTE_Approval_Score'] <= 100)).mean() * 100
+            accuracy_scores.append(valid_aicte)
+        
+        if 'UGC_Rating' in df.columns:
+            valid_ugc = ((df['UGC_Rating'] >= 0) & (df['UGC_Rating'] <= 10)).mean() * 100
+            accuracy_scores.append(valid_ugc)
+        
+        if 'NIRF_Rank' in df.columns:
+            valid_nirf = (df['NIRF_Rank'] > 0).mean() * 100
+            accuracy_scores.append(valid_nirf)
+        
+        if 'Placement_Percentage' in df.columns:
+            valid_placement = ((df['Placement_Percentage'] >= 0) & (df['Placement_Percentage'] <= 100)).mean() * 100
+            accuracy_scores.append(valid_placement)
+        
+        # Check for statistical outliers
+        for col in df.select_dtypes(include=['float64', 'int64']).columns:
+            q1 = df[col].quantile(0.25)
+            q3 = df[col].quantile(0.75)
+            iqr = q3 - q1
+            within_bounds = ((df[col] >= q1 - 1.5*iqr) & (df[col] <= q3 + 1.5*iqr)).mean() * 100
+            accuracy_scores.append(within_bounds)
+        
+        return round(sum(accuracy_scores) / len(accuracy_scores), 2) if accuracy_scores else 0.0
+        
+    except Exception as e:
+        logger.error(f"Error calculating accuracy score: {e}")
+        return 0.0
+
+def calculate_consistency_score(df):
+    """Calculate data consistency score based on format and value patterns"""
+    try:
+        consistency_scores = []
+        
+        # Check string formats
+        if 'College_Name' in df.columns:
+            proper_case = df['College_Name'].str.istitle().mean() * 100
+            consistency_scores.append(proper_case)
+        
+        # Check year consistency
+        if 'Year' in df.columns:
+            year_format = df['Year'].astype(str).str.match(r'^\d{4}$').mean() * 100
+            consistency_scores.append(year_format)
+        
+        # Check numerical precision consistency
+        for col in df.select_dtypes(include=['float64']).columns:
+            decimals = df[col].dropna().apply(lambda x: len(str(x).split('.')[-1]) if '.' in str(x) else 0)
+            consistent_decimals = (decimals == decimals.mode()[0]).mean() * 100
+            consistency_scores.append(consistent_decimals)
+        
+        return round(sum(consistency_scores) / len(consistency_scores), 2) if consistency_scores else 0.0
+        
+    except Exception as e:
+        logger.error(f"Error calculating consistency score: {e}")
+        return 0.0
+
+def calculate_freshness_score(df):
+    """Calculate data freshness score based on dates and last updates"""
+    try:
+        if 'Year' not in df.columns:
+            return 0.0
+            
+        current_year = datetime.now().year
+        years = df['Year'].dropna().unique()
+        
+        if len(years) == 0:
+            return 0.0
+        
+        max_year = max(years)
+        min_year = min(years)
+        
+        # Calculate freshness based on how recent the data is
+        if max_year >= current_year:
+            freshness_score = 100  # Current year data available
+        else:
+            years_old = current_year - max_year
+            freshness_score = max(0, 100 - (years_old * 15))  # Deduct 15 points per year old
+        
+        # Add bonus for historical data availability
+        coverage_years = max_year - min_year + 1
+        if coverage_years >= 5:
+            freshness_score = min(100, freshness_score + 10)  # Bonus for 5+ years of history
+        
+        return round(freshness_score, 2)
+        
+    except Exception as e:
+        logger.error(f"Error calculating freshness score: {e}")
+        return 0.0
+
+def identify_data_issues(df):
+    """Identify data quality issues and categorize them"""
+    try:
+        issues = {
+            'critical': [],
+            'warnings': [],
+            'suggestions': []
+        }
+        
+        # Check for missing values
+        missing_values = df.isnull().sum()
+        for column, count in missing_values.items():
+            if count > 0:
+                percentage = (count / len(df)) * 100
+                if percentage > 20:
+                    issues['critical'].append(f"High missing values in {column}: {percentage:.1f}%")
+                elif percentage > 10:
+                    issues['warnings'].append(f"Missing values in {column}: {percentage:.1f}%")
+                else:
+                    issues['suggestions'].append(f"Some missing values in {column}: {percentage:.1f}%")
+        
+        # Check for data ranges
+        if 'AICTE_Approval_Score' in df.columns:
+            invalid_aicte = df[~df['AICTE_Approval_Score'].between(0, 100)].shape[0]
+            if invalid_aicte > 0:
+                issues['critical'].append(f"Invalid AICTE scores found: {invalid_aicte} records")
+        
+        if 'UGC_Rating' in df.columns:
+            invalid_ugc = df[~df['UGC_Rating'].between(0, 10)].shape[0]
+            if invalid_ugc > 0:
+                issues['warnings'].append(f"Invalid UGC ratings found: {invalid_ugc} records")
+        
+        if 'Placement_Percentage' in df.columns:
+            invalid_placement = df[~df['Placement_Percentage'].between(0, 100)].shape[0]
+            if invalid_placement > 0:
+                issues['warnings'].append(f"Invalid placement percentages found: {invalid_placement} records")
+        
+        # Check for duplicates
+        duplicates = df.duplicated().sum()
+        if duplicates > 0:
+            if duplicates > len(df) * 0.05:  # More than 5% duplicates
+                issues['critical'].append(f"High number of duplicate records: {duplicates}")
+            else:
+                issues['warnings'].append(f"Duplicate records found: {duplicates}")
+        
+        # Check for outliers
+        for col in df.select_dtypes(include=['float64', 'int64']).columns:
+            q1 = df[col].quantile(0.25)
+            q3 = df[col].quantile(0.75)
+            iqr = q3 - q1
+            outliers = df[(df[col] < q1 - 1.5*iqr) | (df[col] > q3 + 1.5*iqr)].shape[0]
+            if outliers > 0:
+                if outliers > len(df) * 0.1:  # More than 10% outliers
+                    issues['warnings'].append(f"High number of outliers in {col}: {outliers} records")
+                else:
+                    issues['suggestions'].append(f"Potential outliers in {col}: {outliers} records")
+        
+        return issues
+        
+    except Exception as e:
+        logger.error(f"Error identifying data issues: {e}")
+        return {'critical': [], 'warnings': [], 'suggestions': []}
+
+def calculate_quality_metrics(df):
+    """Calculate detailed quality metrics"""
+    try:
+        total_records = len(df)
+        missing_count = df.isnull().sum().sum()
+        duplicate_count = df.duplicated().sum()
+        
+        # Calculate outliers
+        outlier_count = 0
+        for col in df.select_dtypes(include=['float64', 'int64']).columns:
+            q1 = df[col].quantile(0.25)
+            q3 = df[col].quantile(0.75)
+            iqr = q3 - q1
+            outliers = df[(df[col] < q1 - 1.5*iqr) | (df[col] > q3 + 1.5*iqr)].shape[0]
+            outlier_count += outliers
+        
+        # Calculate format issues
+        format_issues = 0
+        if 'College_Name' in df.columns:
+            format_issues += df[~df['College_Name'].str.istitle()].shape[0]
+        if 'Year' in df.columns:
+            format_issues += df[~df['Year'].astype(str).str.match(r'^\d{4}$')].shape[0]
+        
+        return {
+            'missing_values': {
+                'count': int(missing_count),
+                'percentage': round((missing_count / (total_records * len(df.columns))) * 100, 2)
+            },
+            'duplicate_records': {
+                'count': int(duplicate_count),
+                'percentage': round((duplicate_count / total_records) * 100, 2)
+            },
+            'outliers': {
+                'count': int(outlier_count),
+                'percentage': round((outlier_count / (total_records * len(df.select_dtypes(include=['float64', 'int64']).columns))) * 100, 2)
+            },
+            'format_issues': {
+                'count': int(format_issues),
+                'percentage': round((format_issues / total_records) * 100, 2)
+            }
+        }
+        
+    except Exception as e:
+        logger.error(f"Error calculating quality metrics: {e}")
+        return {
+            'missing_values': {'count': 0, 'percentage': 0},
+            'duplicate_records': {'count': 0, 'percentage': 0},
+            'outliers': {'count': 0, 'percentage': 0},
+            'format_issues': {'count': 0, 'percentage': 0}
+        }
+
+def generate_recommendations(df, issues, quality_metrics):
+    """Generate actionable recommendations based on identified issues"""
+    try:
+        recommendations = []
+        
+        # Process critical issues first
+        for issue in issues['critical']:
+            if 'missing values' in issue.lower():
+                recommendations.append({
+                    'category': 'Data Completeness',
+                    'severity': 'Critical',
+                    'description': issue,
+                    'action': 'Review and update missing data fields immediately',
+                    'priority': 'high',
+                    'estimated_effort': '1-2 weeks'
+                })
+            elif 'invalid' in issue.lower():
+                recommendations.append({
+                    'category': 'Data Accuracy',
+                    'severity': 'Critical',
+                    'description': issue,
+                    'action': 'Validate and correct records with invalid values',
+                    'priority': 'high',
+                    'estimated_effort': '3-5 days'
+                })
+            elif 'duplicate' in issue.lower():
+                recommendations.append({
+                    'category': 'Data Quality',
+                    'severity': 'Critical',
+                    'description': issue,
+                    'action': 'Remove or reconcile duplicate records',
+                    'priority': 'high',
+                    'estimated_effort': '2-3 days'
+                })
+        
+        # Process warnings
+        for issue in issues['warnings']:
+            if 'missing values' in issue.lower():
+                recommendations.append({
+                    'category': 'Data Completeness',
+                    'severity': 'Medium',
+                    'description': issue,
+                    'action': 'Review and update incomplete records',
+                    'priority': 'medium',
+                    'estimated_effort': '3-5 days'
+                })
+            elif 'outliers' in issue.lower():
+                recommendations.append({
+                    'category': 'Data Accuracy',
+                    'severity': 'Medium',
+                    'description': issue,
+                    'action': 'Investigate and validate outlier records',
+                    'priority': 'medium',
+                    'estimated_effort': '2-3 days'
+                })
+        
+        # Add general recommendations based on quality metrics
+        if quality_metrics['format_issues']['percentage'] > 5:
+            recommendations.append({
+                'category': 'Data Consistency',
+                'severity': 'Medium',
+                'description': f"Format inconsistencies found in {quality_metrics['format_issues']['percentage']}% of records",
+                'action': 'Implement data format standardization',
+                'priority': 'medium',
+                'estimated_effort': '1 week'
+            })
+        
+        # Add suggestions for improvement
+        recommendations.extend([
+            {
+                'category': 'Data Governance',
+                'severity': 'Low',
+                'description': 'Implement regular data quality monitoring',
+                'action': 'Set up automated data quality checks',
+                'priority': 'low',
+                'estimated_effort': '1-2 weeks'
+            },
+            {
+                'category': 'Documentation',
+                'severity': 'Low',
+                'description': 'Improve data documentation and metadata',
+                'action': 'Create comprehensive data dictionary and guidelines',
+                'priority': 'low',
+                'estimated_effort': '1 week'
+            }
+        ])
+        
+        return recommendations[:5]  # Return top 5 most important recommendations
+        
+    except Exception as e:
+        logger.error(f"Error generating recommendations: {e}")
+        return []
 def perform_advanced_trend_analysis(df, analysis_type, institution_filter=None, years_to_predict=5):
     """
     Perform comprehensive trend analysis with statistical modeling
