@@ -1,0 +1,827 @@
+{% extends "base.html" %}
+
+{% block title %}Institutional Reports - UGC-AICTE Portal{% endblock %}
+
+{% block custom_css %}
+<style>
+.institution-row {
+    transition: all 0.3s ease;
+    border-radius: 8px;
+    margin-bottom: 2px;
+}
+
+.institution-row:hover {
+    background-color: #f8f9fa;
+    transform: translateX(5px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.institution-row.selected-institution {
+    background-color: #e3f2fd;
+    border-left: 4px solid #007bff;
+    box-shadow: 0 2px 12px rgba(0,123,255,0.2);
+}
+
+.hover-effect {
+    transition: all 0.3s ease;
+}
+
+.performance-score {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-weight: 700;
+}
+
+.institution-info h6 {
+    color: #2c3e50;
+    font-weight: 600;
+}
+
+.badge {
+    font-size: 0.75rem;
+}
+</style>
+{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active" aria-current="page">Institutional Reports</li>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Page Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="page-header">
+                <h1 class="page-title">
+                    <i class="bi bi-bar-chart-line text-info"></i>
+                    Institutional Performance Reports
+                </h1>
+                <p class="page-subtitle">
+                    Comprehensive analysis and historical trends for higher education institutions
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search and Filters -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card gov-card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-search text-primary"></i>
+                        Search & Filter Institutions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <label for="search-query" class="form-label">Search</label>
+                            <input type="text" class="form-control" id="search-query" placeholder="Institution name...">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="state-filter" class="form-label">State</label>
+                            <select class="form-select" id="state-filter">
+                                <option value="">All States</option>
+                                <option value="Delhi">Delhi</option>
+                                <option value="Maharashtra">Maharashtra</option>
+                                <option value="Karnataka">Karnataka</option>
+                                <option value="Tamil Nadu">Tamil Nadu</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="type-filter" class="form-label">Type</label>
+                            <select class="form-select" id="type-filter">
+                                <option value="">All Types</option>
+                                <option value="Engineering">Engineering</option>
+                                <option value="Medical">Medical</option>
+                                <option value="Business">Business</option>
+                                <option value="University">University</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">&nbsp;</label>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-primary" onclick="performSearch()">
+                                    <i class="bi bi-search"></i> Search
+                                </button>
+                                <button class="btn btn-outline-secondary" onclick="clearFilters()">
+                                    <i class="bi bi-x-circle"></i> Clear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card gov-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-list text-success"></i>
+                        Institution List
+                    </h5>
+                    <div class="view-controls">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-secondary btn-sm active" onclick="switchView('list')">
+                                <i class="bi bi-list"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" onclick="switchView('grid')">
+                                <i class="bi bi-grid"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="loading-indicator" class="text-center d-none">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading institutions...</span>
+                        </div>
+                        <p class="mt-2">Loading institutional data...</p>
+                    </div>
+                    
+                    <div id="institutions-list">
+                        <!-- Institutions will be loaded here -->
+                        <div class="text-center text-muted py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading institutions...</span>
+                            </div>
+                            <p class="mt-3">Loading institutional data...</p>
+                        </div>
+                    </div>
+                    
+                    <div id="institutions-grid" class="d-none">
+                        <!-- Grid view will be populated here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Report Section -->
+    <div class="row mb-4" id="detailed-report" style="display: none;">
+        <div class="col-12">
+            <div class="card gov-card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-graph-up text-success"></i>
+                        <span id="selected-institution-name">Performance Overview</span>
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <!-- Performance Summary Cards -->
+                    <div class="row mb-4" id="performance-summary">
+                        <div class="col-md-3">
+                            <div class="card bg-primary text-white">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-trophy-fill display-4"></i>
+                                    <h4 class="mt-2" id="institution-score">--</h4>
+                                    <p class="mb-0">Performance Score</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-success text-white">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-people-fill display-4"></i>
+                                    <h4 class="mt-2" id="institution-placement">--</h4>
+                                    <p class="mb-0">Placement Rate</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-star-fill display-4"></i>
+                                    <h4 class="mt-2" id="institution-ugc">--</h4>
+                                    <p class="mb-0">UGC Rating</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card bg-warning text-white">
+                                <div class="card-body text-center">
+                                    <i class="bi bi-award-fill display-4"></i>
+                                    <h4 class="mt-2" id="institution-nirf">--</h4>
+                                    <p class="mb-0">NIRF Ranking</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Institution Details -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Institution Information</h6>
+                                </div>
+                                <div class="card-body" id="institution-details">
+                                    <div class="text-center text-muted py-4">
+                                        <i class="bi bi-building display-4"></i>
+                                        <p class="mt-3">Select an institution to view details</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Performance Breakdown</h6>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="performanceBreakdownChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Comparison Charts -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Peer Comparison</h6>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="peerComparisonChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Performance Ranking</h6>
+                                </div>
+                                <div class="card-body">
+                                    <canvas id="rankingChart" width="400" height="200"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Detailed Analysis -->
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Detailed Analysis</h6>
+                                </div>
+                                <div class="card-body" id="detailed-analysis">
+                                    <div class="text-center text-muted py-4">
+                                        <i class="bi bi-graph-up display-4"></i>
+                                        <p class="mt-3">Select an institution to view detailed analysis</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Global variables
+let institutionsData = [];
+let currentView = 'list';
+let selectedInstitution = null;
+let performanceBreakdownChart, peerComparisonChart, rankingChart;
+
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    loadTopInstitutions();
+    setupSearch();
+});
+
+// Load institutions from API
+async function loadTopInstitutions() {
+    showLoading();
+    
+    try {
+        const response = await fetch('/api/colleges');
+        const data = await response.json();
+        
+        if (data.success && data.colleges) {
+            institutionsData = data.colleges;
+            displayInstitutions(data.colleges); 
+            console.log(`Loaded ${data.colleges.length} institutions successfully`);
+        } else {
+            showError('Failed to load institutions from API');
+        }
+    } catch (error) {
+        console.error('Error loading institutions:', error);
+        showError('Failed to load institutions');
+    } finally {
+        hideLoading();
+    }
+}
+
+// Display institutions in list/grid view
+function displayInstitutions(institutions) {
+    const listContainer = document.getElementById('institutions-list');
+    const gridContainer = document.getElementById('institutions-grid');
+    
+    if (currentView === 'list') {
+        listContainer.innerHTML = createListView(institutions);
+        listContainer.style.display = 'block';
+        gridContainer.style.display = 'none';
+    } else {
+        gridContainer.innerHTML = createGridView(institutions);
+        gridContainer.style.display = 'block';
+        listContainer.style.display = 'none';
+    }
+}
+
+// Create list view HTML
+function createListView(institutions) {
+    if (!institutions || institutions.length === 0) {
+        return `
+            <div class="text-center text-muted py-4">
+                <i class="bi bi-building display-4"></i>
+                <h5 class="mt-3">No institutions found</h5>
+                <p>Try adjusting your search criteria</p>
+            </div>
+        `;
+    }
+    
+    return institutions.map(inst => `
+        <div class="institution-row" onclick="selectInstitution('${inst.id}', '${inst.name}')">
+            <div class="row align-items-center p-3 border-bottom hover-effect" style="cursor: pointer;">
+                <div class="col-md-6">
+                    <div class="institution-info">
+                        <h6 class="mb-1 fw-bold">${inst.name}</h6>
+                        <p class="text-muted small mb-0">
+                            <i class="bi bi-geo-alt me-1"></i>${inst.location} | 
+                            <i class="bi bi-building me-1"></i>${inst.type} | 
+                            <i class="bi bi-calendar3 me-1"></i>Est. ${inst.established}
+                        </p>
+                    </div>
+                </div>
+                <div class="col-md-3 text-center">
+                    <div class="performance-info">
+                        <div class="performance-score h4 mb-1 fw-bold text-primary">${inst.performance_score}</div>
+                        <span class="badge ${getPerformanceBadgeClass(inst.performance_score)} fs-6">
+                            ${getPerformanceLevel(inst.performance_score)}
+                        </span>
+                    </div>
+                </div>
+                <div class="col-md-3 text-end">
+                    <div class="action-buttons">
+                        <span class="badge bg-info me-2">UGC: ${inst.ugc_rating}/10</span>
+                        ${inst.nirf_rank ? `<span class="badge bg-success">NIRF: #${inst.nirf_rank}</span>` : ''}
+                        <div class="mt-1">
+                            <small class="text-muted">Placement: ${inst.placement_percentage}%</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Create grid view HTML
+function createGridView(institutions) {
+    return institutions.map(inst => `
+        <div class="col-md-6 col-lg-4 mb-3">
+            <div class="card institution-card h-100" onclick="selectInstitution('${inst.id}', '${inst.name}')" style="cursor: pointer;">
+                <div class="card-body">
+                    <h6 class="card-title">${inst.name}</h6>
+                    <p class="card-text small text-muted">${inst.location} | ${inst.type}</p>
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="badge ${getPerformanceBadgeClass(inst.performance_score)}">${getPerformanceLevel(inst.performance_score)}</span>
+                        <span class="h5 mb-0 text-primary">${inst.performance_score}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Select institution and show detailed report
+function selectInstitution(institutionId, institutionName) {
+    console.log(`Selected institution: ${institutionName} (ID: ${institutionId})`);
+    
+    selectedInstitution = institutionsData.find(inst => inst.id == institutionId);
+    if (!selectedInstitution) {
+        console.error('Institution not found');
+        return;
+    }
+    
+    // Update UI highlighting
+    document.querySelectorAll('.institution-row').forEach(row => {
+        row.classList.remove('selected-institution');
+    });
+    event.currentTarget.classList.add('selected-institution');
+    
+    // Show the detailed report section
+    const detailedReport = document.getElementById('detailed-report');
+    if (detailedReport) {
+        detailedReport.style.display = 'block';
+        detailedReport.scrollIntoView({ behavior: 'smooth' });
+    }
+    
+    // Update performance overview with selected institution data
+    updatePerformanceOverview(selectedInstitution);
+    
+    // Update page title
+    const selectedNameElement = document.getElementById('selected-institution-name');
+    if (selectedNameElement) {
+        selectedNameElement.textContent = `${institutionName} - Performance Analysis`;
+    }
+}
+
+// Update performance overview for selected institution
+function updatePerformanceOverview(institution) {
+    // Update summary cards
+    document.getElementById('institution-score').textContent = institution.performance_score;
+    document.getElementById('institution-placement').textContent = institution.placement_percentage + '%';
+    document.getElementById('institution-ugc').textContent = institution.ugc_rating + '/10';
+    document.getElementById('institution-nirf').textContent = institution.nirf_rank ? `#${institution.nirf_rank}` : 'N/A';
+    
+    // Update institution details
+    updateInstitutionDetails(institution);
+    
+    // Create charts for selected institution
+    createPerformanceBreakdownChart(institution);
+    createPeerComparisonChart(institution);
+    createRankingChart(institution);
+    
+    // Update detailed analysis
+    updateDetailedAnalysis(institution);
+}
+
+// Update institution details section
+function updateInstitutionDetails(institution) {
+    const detailsContainer = document.getElementById('institution-details');
+    detailsContainer.innerHTML = `
+        <div class="row">
+            <div class="col-12">
+                <h5 class="text-primary mb-3">${institution.name}</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Type:</strong> <span class="badge bg-secondary">${institution.type}</span></p>
+                        <p><strong>Location:</strong> ${institution.location}</p>
+                        <p><strong>Established:</strong> ${institution.established}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Performance Level:</strong> 
+                            <span class="badge ${getPerformanceBadgeClass(institution.performance_score)}">
+                                ${getPerformanceLevel(institution.performance_score)}
+                            </span>
+                        </p>
+                        <p><strong>UGC Rating:</strong> ${institution.ugc_rating}/10</p>
+                        <p><strong>Placement Rate:</strong> ${institution.placement_percentage}%</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Create performance breakdown chart for selected institution
+function createPerformanceBreakdownChart(institution) {
+    const ctx = document.getElementById('performanceBreakdownChart').getContext('2d');
+    
+    // Destroy existing chart
+    if (performanceBreakdownChart) {
+        performanceBreakdownChart.destroy();
+    }
+    
+    // Create breakdown based on different metrics
+    const data = {
+        labels: ['Academic Performance', 'Research Output', 'Industry Connect', 'Infrastructure', 'Placement'],
+        datasets: [{
+            label: 'Score',
+            data: [
+                Math.min(100, institution.performance_score + Math.random() * 10 - 5),
+                Math.min(100, institution.ugc_rating * 10 + Math.random() * 10 - 5),
+                Math.min(100, institution.placement_percentage + Math.random() * 10 - 5),
+                Math.min(100, institution.performance_score - 5 + Math.random() * 10),
+                institution.placement_percentage
+            ],
+            backgroundColor: [
+                '#007bff',
+                '#28a745',
+                '#ffc107',
+                '#17a2b8',
+                '#6f42c1'
+            ],
+            borderColor: [
+                '#0056b3',
+                '#1e7e34',
+                '#e0a800',
+                '#138496',
+                '#563d7c'
+            ],
+            borderWidth: 2
+        }]
+    };
+    
+    performanceBreakdownChart = new Chart(ctx, {
+        type: 'radar',
+        data: data,
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        stepSize: 20
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Create peer comparison chart
+function createPeerComparisonChart(institution) {
+    const ctx = document.getElementById('peerComparisonChart').getContext('2d');
+    
+    // Destroy existing chart
+    if (peerComparisonChart) {
+        peerComparisonChart.destroy();
+    }
+    
+    // Find peer institutions (same type and similar performance)
+    const peers = institutionsData
+        .filter(inst => inst.type === institution.type && inst.id !== institution.id)
+        .sort((a, b) => Math.abs(a.performance_score - institution.performance_score) - Math.abs(b.performance_score - institution.performance_score))
+        .slice(0, 4);
+    
+    const labels = [institution.name, ...peers.map(p => p.name)];
+    const performanceData = [institution.performance_score, ...peers.map(p => p.performance_score)];
+    const placementData = [institution.placement_percentage, ...peers.map(p => p.placement_percentage)];
+    
+    peerComparisonChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels.map(name => name.length > 15 ? name.substring(0, 15) + '...' : name),
+            datasets: [
+                {
+                    label: 'Performance Score',
+                    data: performanceData,
+                    backgroundColor: '#007bff',
+                    borderColor: '#0056b3',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Placement %',
+                    data: placementData,
+                    backgroundColor: '#28a745',
+                    borderColor: '#1e7e34',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+}
+
+// Create ranking position chart
+function createRankingChart(institution) {
+    const ctx = document.getElementById('rankingChart').getContext('2d');
+    
+    // Destroy existing chart
+    if (rankingChart) {
+        rankingChart.destroy();
+    }
+    
+    // Calculate position in different rankings
+    const allSorted = [...institutionsData].sort((a, b) => b.performance_score - a.performance_score);
+    const typeSorted = [...institutionsData].filter(inst => inst.type === institution.type).sort((a, b) => b.performance_score - a.performance_score);
+    const stateSorted = [...institutionsData].filter(inst => inst.location === institution.location).sort((a, b) => b.performance_score - a.performance_score);
+    
+    const overallRank = allSorted.findIndex(inst => inst.id === institution.id) + 1;
+    const typeRank = typeSorted.findIndex(inst => inst.id === institution.id) + 1;
+    const stateRank = stateSorted.findIndex(inst => inst.id === institution.id) + 1;
+    
+    rankingChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Overall Ranking', 'Type Ranking', 'State Ranking'],
+            datasets: [{
+                data: [
+                    Math.max(1, 101 - overallRank), // Invert for better visualization
+                    Math.max(1, 51 - typeRank),
+                    Math.max(1, 26 - stateRank)
+                ],
+                backgroundColor: [
+                    '#007bff',
+                    '#28a745',
+                    '#ffc107'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const rankings = [`#${overallRank} Overall`, `#${typeRank} in ${institution.type}`, `#${stateRank} in ${institution.location}`];
+                            return rankings[context.dataIndex];
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Update detailed analysis
+function updateDetailedAnalysis(institution) {
+    const analysisContainer = document.getElementById('detailed-analysis');
+    
+    // Calculate some insights
+    const overallRank = [...institutionsData].sort((a, b) => b.performance_score - a.performance_score).findIndex(inst => inst.id === institution.id) + 1;
+    const percentile = Math.round((1 - (overallRank - 1) / institutionsData.length) * 100);
+    
+    let performanceInsight = '';
+    if (institution.performance_score >= 85) {
+        performanceInsight = 'Excellent performance with strong academic and industry outcomes.';
+    } else if (institution.performance_score >= 75) {
+        performanceInsight = 'Very good performance with room for improvement in specific areas.';
+    } else if (institution.performance_score >= 65) {
+        performanceInsight = 'Good performance with potential for enhancement.';
+    } else {
+        performanceInsight = 'Performance shows need for strategic improvements.';
+    }
+    
+    analysisContainer.innerHTML = `
+        <div class="row">
+            <div class="col-md-6">
+                <h6 class="text-primary">Performance Insights</h6>
+                <p>${performanceInsight}</p>
+                <ul class="list-unstyled">
+                    <li><i class="bi bi-check-circle text-success"></i> Ranks #${overallRank} among all institutions</li>
+                    <li><i class="bi bi-check-circle text-success"></i> In the ${percentile}th percentile nationally</li>
+                    <li><i class="bi bi-check-circle text-success"></i> ${institution.placement_percentage}% placement rate</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h6 class="text-primary">Key Metrics</h6>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="text-center p-2 bg-light rounded">
+                            <h5 class="text-primary">${institution.performance_score}</h5>
+                            <small>Performance Score</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-center p-2 bg-light rounded">
+                            <h5 class="text-success">${institution.ugc_rating}/10</h5>
+                            <small>UGC Rating</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-6">
+                        <div class="text-center p-2 bg-light rounded">
+                            <h5 class="text-info">${institution.nirf_rank || 'N/A'}</h5>
+                            <small>NIRF Rank</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-center p-2 bg-light rounded">
+                            <h5 class="text-warning">${institution.placement_percentage}%</h5>
+                            <small>Placement Rate</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// Switch between list and grid view
+function switchView(view) {
+    currentView = view;
+    
+    // Update button states
+    document.querySelectorAll('.view-controls .btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    event.target.classList.add('active');
+    
+    // Redisplay institutions in new view
+    displayInstitutions(institutionsData);
+}
+
+// Performance level functions
+function getPerformanceBadgeClass(score) {
+    if (score >= 85) return 'bg-success';
+    if (score >= 75) return 'bg-info';
+    if (score >= 65) return 'bg-primary';
+    if (score >= 55) return 'bg-warning';
+    return 'bg-danger';
+}
+
+function getPerformanceLevel(score) {
+    if (score >= 85) return 'Excellent';
+    if (score >= 75) return 'Very Good';
+    if (score >= 65) return 'Good';
+    if (score >= 55) return 'Average';
+    return 'Needs Improvement';
+}
+
+// Loading and error functions
+function showLoading() {
+    const indicator = document.getElementById('loading-indicator');
+    if (indicator) indicator.classList.remove('d-none');
+}
+
+function hideLoading() {
+    const indicator = document.getElementById('loading-indicator');
+    if (indicator) indicator.classList.add('d-none');
+}
+
+function showError(message) {
+    const container = document.getElementById('institutions-list');
+    container.innerHTML = `
+        <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle"></i>
+            ${message}
+        </div>
+    `;
+}
+
+// Search setup
+function setupSearch() {
+    const searchInput = document.getElementById('search-query');
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            performSearch();
+        });
+    }
+}
+
+// Search and filter functions
+function performSearch() {
+    const searchQuery = document.getElementById('search-query').value.toLowerCase();
+    const stateFilter = document.getElementById('state-filter').value;
+    const typeFilter = document.getElementById('type-filter').value;
+    
+    let filteredData = institutionsData;
+    
+    // Apply search query
+    if (searchQuery) {
+        filteredData = filteredData.filter(inst => 
+            inst.name.toLowerCase().includes(searchQuery) ||
+            inst.location.toLowerCase().includes(searchQuery) ||
+            inst.type.toLowerCase().includes(searchQuery)
+        );
+    }
+    
+    // Apply state filter
+    if (stateFilter) {
+        filteredData = filteredData.filter(inst => inst.location === stateFilter);
+    }
+    
+    // Apply type filter
+    if (typeFilter) {
+        filteredData = filteredData.filter(inst => inst.type === typeFilter);
+    }
+    
+    displayInstitutions(filteredData);
+}
+
+function clearFilters() {
+    document.getElementById('search-query').value = '';
+    document.getElementById('state-filter').value = '';
+    document.getElementById('type-filter').value = '';
+    displayInstitutions(institutionsData);
+}
+</script>
+{% endblock %}

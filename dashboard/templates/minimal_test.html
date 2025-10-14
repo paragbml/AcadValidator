@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}Test - UGC-AICTE Portal{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="alert alert-success">
+        <h1>🎉 SUCCESS! Template is working!</h1>
+        <p>If you can see this green box, the template system is functioning correctly.</p>
+        <hr>
+        <p><strong>Debug info:</strong></p>
+        <ul>
+            <li>Template: minimal_test.html</li>
+            <li>Stats: {{ stats }}</li>
+            <li>Page Title: {{ page_title }}</li>
+        </ul>
+    </div>
+</div>
+{% endblock %}

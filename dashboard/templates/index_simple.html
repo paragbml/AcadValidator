@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Home - UGC-AICTE Institutional Performance Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 60px 0;
+        border-radius: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .hero-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-bottom: 30px;
+        line-height: 1.6;
+    }
+    
+    .stat-card {
+        background: rgba(255,255,255,0.1);
+        border-radius: 15px;
+        padding: 20px;
+        margin: 10px 0;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .stat-number {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.8;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Hero Section -->
+    <div class="hero-section text-center mb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h1 class="hero-title">
+                    <i class="bi bi-graph-up-arrow text-primary"></i>
+                    AI-Powered Institutional Analytics
+                </h1>
+                <p class="hero-subtitle">
+                    Advanced machine learning platform for predicting and analyzing higher education institutional performance across India
+                </p>
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <h3 class="stat-number">{{ stats.total_colleges if stats else 150 }}+</h3>
+                            <p class="stat-label">Institutions Analyzed</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <h3 class="stat-number">{{ stats.total_records if stats else 750 }}+</h3>
+                            <p class="stat-label">Data Points</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <h3 class="stat-number">{{ stats.years_covered|length if stats and stats.years_covered else 5 }}</h3>
+                            <p class="stat-label">Years of Data</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Simple Card for Testing -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-calculator text-primary"></i>
+                        Performance Prediction
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Feature temporarily simplified for testing. Full functionality will be restored shortly.</p>
+                    <button class="btn btn-primary">Test Button</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

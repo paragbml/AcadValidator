@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+
+{% block title %}AI Recommendations - UGC-AICTE Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+.recommendations-dashboard {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px 0;
+}
+
+.recommendations-header {
+    background: rgba(255,255,255,0.95);
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+}
+
+.recommendation-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.recommendation-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+.recommendation-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+    margin-bottom: 20px;
+}
+
+.priority-high { background: linear-gradient(135deg, #ff6b6b, #ee5a52); }
+.priority-medium { background: linear-gradient(135deg, #4ecdc4, #44a08d); }
+.priority-low { background: linear-gradient(135deg, #45b7d1, #96c93d); }
+
+.ai-badge {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+</style>
+{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{{ url_for('index') }}">Dashboard</a></li>
+<li class="breadcrumb-item active" aria-current="page">AI Recommendations</li>
+{% endblock %}
+
+{% block content %}
+<div class="recommendations-dashboard">
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="recommendations-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-3">
+                        <i class="bi bi-robot text-primary"></i>
+                        AI-Powered Recommendations
+                    </h1>
+                    <p class="lead mb-0">Intelligent insights and actionable recommendations for institutional improvement</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="ai-badge">
+                        <i class="bi bi-stars"></i>
+                        <span>AI-Generated</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendations Grid -->
+        <div class="row">
+            <!-- High Priority Recommendations -->
+            <div class="col-lg-6 mb-4">
+                <div class="recommendation-card">
+                    <div class="recommendation-icon priority-high">
+                        <i class="bi bi-exclamation-circle"></i>
+                    </div>
+                    <h4 class="text-dark mb-3">High Priority Actions</h4>
+                    <div class="recommendations-list">
+                        <div class="recommendation-item mb-3 p-3 border-start border-danger border-4 bg-light">
+                            <h6 class="text-danger mb-2">Faculty Development</h6>
+                            <p class="text-muted mb-2">Enhance faculty qualifications and research capabilities</p>
+                            <small class="text-secondary">Expected Impact: +15% performance score</small>
+                        </div>
+                        <div class="recommendation-item mb-3 p-3 border-start border-danger border-4 bg-light">
+                            <h6 class="text-danger mb-2">Infrastructure Upgrade</h6>
+                            <p class="text-muted mb-2">Modernize laboratories and digital infrastructure</p>
+                            <small class="text-secondary">Expected Impact: +12% performance score</small>
+                        </div>
+                        <div class="recommendation-item p-3 border-start border-danger border-4 bg-light">
+                            <h6 class="text-danger mb-2">Research Publications</h6>
+                            <p class="text-muted mb-2">Increase research output and publication quality</p>
+                            <small class="text-secondary">Expected Impact: +18% performance score</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Medium Priority Recommendations -->
+            <div class="col-lg-6 mb-4">
+                <div class="recommendation-card">
+                    <div class="recommendation-icon priority-medium">
+                        <i class="bi bi-arrow-up-circle"></i>
+                    </div>
+                    <h4 class="text-dark mb-3">Medium Priority Actions</h4>
+                    <div class="recommendations-list">
+                        <div class="recommendation-item mb-3 p-3 border-start border-info border-4 bg-light">
+                            <h6 class="text-info mb-2">Industry Partnerships</h6>
+                            <p class="text-muted mb-2">Strengthen connections with industry leaders</p>
+                            <small class="text-secondary">Expected Impact: +10% placement rate</small>
+                        </div>
+                        <div class="recommendation-item mb-3 p-3 border-start border-info border-4 bg-light">
+                            <h6 class="text-info mb-2">Student Support Services</h6>
+                            <p class="text-muted mb-2">Enhance counseling and career guidance programs</p>
+                            <small class="text-secondary">Expected Impact: +8% student satisfaction</small>
+                        </div>
+                        <div class="recommendation-item p-3 border-start border-info border-4 bg-light">
+                            <h6 class="text-info mb-2">Digital Transformation</h6>
+                            <p class="text-muted mb-2">Implement digital learning platforms</p>
+                            <small class="text-secondary">Expected Impact: +7% efficiency score</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Implementation Roadmap -->
+            <div class="col-12 mb-4">
+                <div class="recommendation-card">
+                    <h4 class="text-dark mb-4">
+                        <i class="bi bi-map text-primary"></i>
+                        Implementation Roadmap
+                    </h4>
+                    <div class="timeline">
+                        <div class="row">
+                            <div class="col-md-3 mb-3">
+                                <div class="timeline-item bg-danger text-white rounded p-3 text-center">
+                                    <h6 class="mb-2">Quarter 1</h6>
+                                    <small>Faculty Development</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="timeline-item bg-warning text-white rounded p-3 text-center">
+                                    <h6 class="mb-2">Quarter 2</h6>
+                                    <small>Infrastructure Upgrade</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="timeline-item bg-info text-white rounded p-3 text-center">
+                                    <h6 class="mb-2">Quarter 3</h6>
+                                    <small>Research Enhancement</small>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="timeline-item bg-success text-white rounded p-3 text-center">
+                                    <h6 class="mb-2">Quarter 4</h6>
+                                    <small>Industry Partnerships</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Insights -->
+            <div class="col-12">
+                <div class="recommendation-card">
+                    <h4 class="text-dark mb-4">
+                        <i class="bi bi-lightbulb text-warning"></i>
+                        AI Insights
+                    </h4>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="insight-item p-3 bg-light rounded mb-3">
+                                <h6 class="text-primary">Performance Prediction</h6>
+                                <p class="text-muted mb-0">Based on current trends, implementing these recommendations could improve your institutional ranking by 25-30 positions</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="insight-item p-3 bg-light rounded mb-3">
+                                <h6 class="text-success">Cost-Benefit Analysis</h6>
+                                <p class="text-muted mb-0">Estimated ROI of 3.2x over 2 years with focused implementation of high-priority recommendations</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add any interactive functionality here
+    console.log('AI Recommendations page loaded');
+});
+</script>
+{% endblock %}

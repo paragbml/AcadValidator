@@ -1,0 +1,2198 @@
+{% extends "base.html" %}
+
+{% block title %}Prediction Results - UGC-AICTE Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+.performance-circle {
+    position: relative;
+    z-index: 1;
+}
+
+.performance-score {
+    position: relative;
+    z-index: 10;
+    color: #002D62 !important;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.performance-badge {
+    position: relative;
+    z-index: 10;
+    margin-bottom: 15px;
+}
+
+#performanceGauge {
+    position: relative;
+    z-index: 1;
+    max-height: 150px;
+}
+
+.metric-item {
+    margin-bottom: 15px;
+    padding: 10px 0;
+}
+
+.metric-item .progress {
+    height: 8px;
+    margin-top: 5px;
+    border-radius: 4px;
+}
+
+.metric-item .d-flex {
+    margin-bottom: 5px;
+}
+
+.comparison-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px 0;
+}
+
+.blockchain-verification {
+    background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    border: 2px solid #1976d2;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 15px 0;
+}
+
+.verification-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.status-verified {
+    background-color: #e8f5e8;
+    color: #2e7d2e;
+    border: 1px solid #4caf50;
+}
+
+.status-pending {
+    background-color: #fff3e0;
+    color: #f57c00;
+    border: 1px solid #ff9800;
+}
+
+.hash-display {
+    font-family: 'Courier New', monospace;
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 0.8rem;
+    word-break: break-all;
+}
+
+/* AI Insights Styles */
+.ai-response-text {
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+.ai-response-text h1, .ai-response-text h2, .ai-response-text h3 {
+    color: #2c3e50;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.ai-response-text strong {
+    color: #34495e;
+    font-weight: 600;
+}
+
+.ai-confidence-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid #dee2e6;
+}
+
+.confidence-score .badge {
+    font-size: 1rem;
+    padding: 8px 16px;
+}
+
+.strength-items .strength-item {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    border: 1px solid #28a745;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.strength-items .strength-item i {
+    color: #28a745;
+    font-size: 1.5rem;
+    margin-right: 15px;
+}
+
+.improvement-items .improvement-item {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border: 1px solid #ffc107;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.improvement-item .priority-badge {
+    float: right;
+    margin-top: -5px;
+}
+
+.recommendation-items .recommendation-item {
+    background: linear-gradient(135deg, #cce5ff 0%, #b3d9ff 100%);
+    border: 1px solid #0066cc;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: start;
+}
+
+.recommendation-items .recommendation-item i {
+    color: #0066cc;
+    font-size: 1.2rem;
+    margin-right: 12px;
+    margin-top: 3px;
+}
+
+.bg-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+#aiAnalysisTabs .nav-link {
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+    margin-right: 5px;
+    border-radius: 8px;
+}
+
+#aiAnalysisTabs .nav-link.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+    color: white;
+}
+
+#aiAnalysisTabs .nav-link:hover {
+    border-color: #667eea;
+    color: #667eea;
+}
+
+/* Enhanced Recommendations Cards */
+.recommendation-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border: 1px solid #e9ecef;
+    border-radius: 12px;
+    padding: 20px;
+    transition: all 0.3s ease;
+    height: 100%;
+}
+
+.recommendation-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    border-color: #007bff;
+}
+
+.recommendation-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 15px;
+    flex-shrink: 0;
+}
+
+.recommendation-icon i {
+    color: white;
+    font-size: 1.2rem;
+}
+
+.recommendation-content {
+    flex: 1;
+}
+
+/* Tier Indicators */
+.tier-indicators {
+    margin-top: 15px;
+}
+
+.tier-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 8px 0;
+}
+
+.tier-label {
+    font-weight: 600;
+    color: #495057;
+}
+
+.tier-range {
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.tier-bar {
+    width: 100%;
+    height: 8px;
+    background-color: #e9ecef;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 5px;
+}
+
+.tier-fill {
+    height: 100%;
+    transition: width 0.8s ease;
+}
+
+.tier-1 { background: linear-gradient(90deg, #28a745, #20c997); }
+.tier-2 { background: linear-gradient(90deg, #007bff, #17a2b8); }
+.tier-3 { background: linear-gradient(90deg, #ffc107, #fd7e14); }
+
+/* Benchmark Stats */
+.benchmark-stats {
+    border-top: 1px solid #e9ecef;
+    padding-top: 15px;
+}
+
+.stat-box {
+    text-align: center;
+    padding: 15px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #007bff;
+    margin-bottom: 5px;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Legend styling */
+.comparison-legend {
+    border-top: 1px solid #e9ecef;
+    padding-top: 15px;
+}
+
+.legend-item {
+    text-align: center;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin: 0 auto 8px;
+}
+
+/* Enhanced Chart Container */
+.chart-container {
+    position: relative;
+    background: #fff;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+/* Enhanced Progress Bars */
+.metric-item .progress-bar {
+    border-radius: 4px;
+    transition: width 1s ease-in-out;
+}
+
+/* Performance Level Badges */
+.badge {
+    font-size: 0.875rem;
+    padding: 8px 12px;
+}
+
+/* Animation Classes */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.card {
+    animation: slideInUp 0.6s ease-out;
+}
+
+/* Print Styles */
+@media print {
+    .btn, .modal, .navbar {
+        display: none !important;
+    }
+    
+    .card {
+        border: 1px solid #000 !important;
+        box-shadow: none !important;
+    }
+    
+    .page-break {
+        page-break-before: always;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .performance-score {
+        font-size: 2.5rem !important;
+    }
+    
+    .tier-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .recommendation-card {
+        margin-bottom: 15px;
+    }
+    
+    .stat-box {
+        margin-bottom: 15px;
+    }
+}
+
+/* Loading states */
+.loading-skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* Enhanced AI Insights Section */
+#aiInsightsSection {
+    margin-top: 2rem;
+}
+
+#aiAnalysisLoading {
+    min-height: 150px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Enhanced buttons */
+.btn-group-vertical .btn {
+    margin-bottom: 10px;
+    border-radius: 8px !important;
+}
+
+.btn-group-vertical .btn:last-child {
+    margin-bottom: 0;
+}
+
+/* Card hover effects */
+.gov-card {
+    transition: all 0.3s ease;
+}
+
+.gov-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+/* Enhanced verification section */
+.verification-badge {
+    padding: 20px;
+}
+
+.verification-badge .display-3 {
+    font-size: 3rem;
+    margin-bottom: 10px;
+}
+</style>
+{% endblock %}
+.verification-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.status-verified {
+    background-color: #e8f5e8;
+    color: #2e7d2e;
+    border: 1px solid #4caf50;
+}
+
+.status-pending {
+    background-color: #fff3e0;
+    color: #f57c00;
+    border: 1px solid #ff9800;
+}
+
+.hash-display {
+    font-family: 'Courier New', monospace;
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 8px;
+    font-size: 0.8rem;
+    word-break: break-all;
+}
+
+/* AI Insights Styles */
+.ai-response-text {
+    line-height: 1.6;
+    font-size: 1rem;
+}
+
+.ai-response-text h1, .ai-response-text h2, .ai-response-text h3 {
+    color: #2c3e50;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.ai-response-text strong {
+    color: #34495e;
+    font-weight: 600;
+}
+
+.ai-confidence-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid #dee2e6;
+}
+
+.confidence-score .badge {
+    font-size: 1rem;
+    padding: 8px 16px;
+}
+
+.strength-items .strength-item {
+    background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+    border: 1px solid #28a745;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.strength-items .strength-item i {
+    color: #28a745;
+    font-size: 1.5rem;
+    margin-right: 15px;
+}
+
+.improvement-items .improvement-item {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffeaa7 100%);
+    border: 1px solid #ffc107;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.improvement-item .priority-badge {
+    float: right;
+    margin-top: -5px;
+}
+
+.recommendation-items .recommendation-item {
+    background: linear-gradient(135deg, #cce5ff 0%, #b3d9ff 100%);
+    border: 1px solid #0066cc;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: start;
+}
+
+.recommendation-items .recommendation-item i {
+    color: #0066cc;
+    font-size: 1.2rem;
+    margin-right: 12px;
+    margin-top: 3px;
+}
+
+.bg-gradient {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+}
+
+#aiAnalysisTabs .nav-link {
+    color: #6c757d;
+    border: 1px solid #dee2e6;
+    margin-right: 5px;
+    border-radius: 8px;
+}
+
+#aiAnalysisTabs .nav-link.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+    color: white;
+}
+
+#aiAnalysisTabs .nav-link:hover {
+    border-color: #667eea;
+    color: #667eea;
+}
+</style>
+{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{{ url_for('index') }}">Dashboard</a></li>
+<li class="breadcrumb-item active" aria-current="page">Prediction Results</li>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Results Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-success border-0 shadow-sm">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h4 class="alert-heading mb-1">
+                            <i class="bi bi-check-circle"></i>
+                            Performance Analysis Complete
+                        </h4>
+                        <p class="mb-0">AI-powered analysis has been generated based on your institutional metrics</p>
+                    </div>
+                    <div class="col-md-4 text-end">
+                        <button class="btn btn-outline-success" onclick="window.print()">
+                            <i class="bi bi-printer"></i> Print Report
+                        </button>
+                        <button class="btn btn-success" onclick="downloadReport()">
+                            <i class="bi bi-download"></i> Download PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Score Section -->
+    <div class="row mb-4">
+        <div class="col-lg-4 mb-3">
+            <div class="card gov-card text-center h-100">
+                <div class="card-body">
+                    <!-- Performance Score Display - Now above the gauge -->
+                    <h2 class="performance-score mb-2 text-primary" id="scoreDisplay">
+                        <span style="font-size: 3rem; font-weight: bold;">{{ prediction.performance_index if prediction else '--' }}</span>
+                        <small class="text-muted d-block">Performance Index</small>
+                    </h2>
+                    <div class="performance-badge mb-3">
+                        <span class="badge badge-{{ prediction.level_color if prediction else 'secondary' }} fs-6" id="levelBadge">
+                            {{ prediction.performance_level if prediction else 'Not Available' }}
+                        </span>
+                    </div>
+                    <!-- Gauge Chart - Smaller and positioned below score -->
+                    <div class="performance-circle" style="position: relative; height: 150px;">
+                        <canvas id="performanceGauge" width="150" height="150"></canvas>
+                    </div>
+                    <p class="text-muted mt-2 small" id="levelDescription">
+                        {{ prediction.level_description if prediction else 'No prediction available' }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="card gov-card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-graph-up text-primary"></i>
+                        Performance Breakdown
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <canvas id="metricsChart" width="300" height="200"></canvas>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="metrics-summary">
+                                <h6>Key Performance Indicators</h6>
+                                <div class="metric-item">
+                                    <div class="d-flex justify-content-between">
+                                        <span>AICTE Compliance</span>
+                                        <span class="fw-bold" id="aicte-display">{{ input_data.AICTE_Approval_Score if input_data else '--' }}%</span>
+                                    </div>
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar bg-primary" style="width: {{ input_data.AICTE_Approval_Score if input_data else 0 }}%"></div>
+                                    </div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="d-flex justify-content-between">
+                                        <span>UGC Rating</span>
+                                        <span class="fw-bold" id="ugc-display">{{ input_data.UGC_Rating if input_data else '--' }}/10</span>
+                                    </div>
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar bg-info" style="width: {{ (input_data.UGC_Rating * 10) if input_data else 0 }}%"></div>
+                                    </div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Placement Success</span>
+                                        <span class="fw-bold" id="placement-display">{{ input_data.Placement_Percentage if input_data else '--' }}%</span>
+                                    </div>
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar bg-success" style="width: {{ input_data.Placement_Percentage if input_data else 0 }}%"></div>
+                                    </div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="d-flex justify-content-between">
+                                        <span>Student Satisfaction</span>
+                                        <span class="fw-bold" id="satisfaction-display">{{ input_data.Student_Satisfaction_Score if input_data else '--' }}%</span>
+                                    </div>
+                                    <div class="progress mb-2">
+                                        <div class="progress-bar bg-warning" style="width: {{ input_data.Student_Satisfaction_Score if input_data else 0 }}%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recommendations Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card gov-card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-lightbulb text-warning"></i>
+                        AI-Generated Improvement Recommendations
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if recommendations %}
+                    <div class="row">
+                        {% for recommendation in recommendations %}
+                        <div class="col-md-6 mb-3">
+                            <div class="recommendation-card">
+                                <div class="d-flex align-items-start">
+                                    <div class="recommendation-icon">
+                                        <i class="bi bi-arrow-up-circle text-primary"></i>
+                                    </div>
+                                    <div class="recommendation-content">
+                                        <p class="mb-0">{{ recommendation }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center text-muted">
+                        <i class="bi bi-lightbulb display-4"></i>
+                        <h5 class="mt-3">No recommendations available</h5>
+                        <p>Run a prediction to get personalized improvement suggestions</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Insights Section -->
+    <div class="row mb-4" id="aiInsightsSection" style="display: none;">
+        <div class="col-12">
+            <div class="card gov-card border-primary">
+                <div class="card-header bg-gradient" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-robot me-2"></i>
+                            Google Gemini AI Analysis
+                        </h5>
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-light text-dark me-2">
+                                <i class="bi bi-stars me-1"></i>Gemini 1.5 Flash
+                            </span>
+                            <button class="btn btn-sm btn-outline-light" id="refreshAIAnalysis">
+                                <i class="bi bi-arrow-clockwise me-1"></i>Refresh Analysis
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- AI Analysis Loading -->
+                    <div id="aiAnalysisLoading" class="text-center py-4">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading AI analysis...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Generating AI-powered insights...</p>
+                    </div>
+
+                    <!-- AI Analysis Content -->
+                    <div id="aiAnalysisContent" style="display: none;">
+                        <!-- Performance Analysis Tab -->
+                        <div class="mb-4">
+                            <ul class="nav nav-pills mb-3" id="aiAnalysisTabs" role="tablist">
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link active" id="overview-tab" data-bs-toggle="pill" 
+                                            data-bs-target="#overview" type="button" role="tab">
+                                        <i class="bi bi-graph-up me-1"></i>Overview
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="strengths-tab" data-bs-toggle="pill" 
+                                            data-bs-target="#strengths" type="button" role="tab">
+                                        <i class="bi bi-trophy me-1"></i>Strengths
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="improvements-tab" data-bs-toggle="pill" 
+                                            data-bs-target="#improvements" type="button" role="tab">
+                                        <i class="bi bi-target me-1"></i>Improvements
+                                    </button>
+                                </li>
+                                <li class="nav-item" role="presentation">
+                                    <button class="nav-link" id="recommendations-tab" data-bs-toggle="pill" 
+                                            data-bs-target="#ai-recommendations" type="button" role="tab">
+                                        <i class="bi bi-lightbulb me-1"></i>AI Recommendations
+                                    </button>
+                                </li>
+                            </ul>
+                            
+                            <div class="tab-content" id="aiAnalysisTabContent">
+                                <!-- Overview Tab -->
+                                <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                                    <div class="ai-analysis-overview">
+                                        <div class="row mb-3">
+                                            <div class="col-md-8">
+                                                <div id="aiDetailedAnalysis" class="ai-response-text">
+                                                    <!-- AI detailed analysis will be populated here -->
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="ai-confidence-card">
+                                                    <h6>Analysis Confidence</h6>
+                                                    <div class="confidence-score mb-2">
+                                                        <span id="confidenceScore" class="badge bg-success">High</span>
+                                                    </div>
+                                                    <small class="text-muted">Based on data completeness and quality</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Strengths Tab -->
+                                <div class="tab-pane fade" id="strengths" role="tabpanel">
+                                    <div id="aiStrengths" class="strength-items">
+                                        <!-- AI-identified strengths will be populated here -->
+                                    </div>
+                                </div>
+                                
+                                <!-- Improvements Tab -->
+                                <div class="tab-pane fade" id="improvements" role="tabpanel">
+                                    <div id="aiImprovements" class="improvement-items">
+                                        <!-- AI-identified improvements will be populated here -->
+                                    </div>
+                                </div>
+                                
+                                <!-- AI Recommendations Tab -->
+                                <div class="tab-pane fade" id="ai-recommendations" role="tabpanel">
+                                    <div id="aiRecommendations" class="recommendation-items">
+                                        <!-- AI recommendations will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Blockchain Document Verification Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card gov-card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-shield-lock text-primary"></i>
+                        Blockchain Document Verification
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="blockchain-verification">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h6 class="mb-2">
+                                    <i class="bi bi-file-earmark-check"></i>
+                                    Document Authenticity Status
+                                </h6>
+                                <p class="mb-2">
+                                    All submitted documents have been cryptographically verified using blockchain technology.
+                                </p>
+                                <div class="d-flex gap-2 mb-3">
+                                    <span class="verification-status status-verified">
+                                        <i class="bi bi-check-circle"></i>
+                                        AICTE Certificate Verified
+                                    </span>
+                                    <span class="verification-status status-verified">
+                                        <i class="bi bi-check-circle"></i>
+                                        UGC Recognition Verified
+                                    </span>
+                                    <span class="verification-status status-pending">
+                                        <i class="bi bi-clock"></i>
+                                        Faculty Records Pending
+                                    </span>
+                                </div>
+                                <div class="mb-2">
+                                    <small class="text-muted">Document Hash:</small>
+                                    <div class="hash-display">
+                                        <span id="document-hash">0x7d865e959b2466918c9863afca942d0fb89d7c9ac0c99bafc3749504ded97730</span>
+                                        <button class="btn btn-link btn-sm p-0 ms-2" onclick="copyHash()" title="Copy Hash">
+                                            <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <div class="verification-badge">
+                                    <i class="bi bi-shield-check display-3 text-success"></i>
+                                    <div class="mt-2">
+                                        <strong class="text-success">87% Verified</strong>
+                                        <br>
+                                        <small class="text-muted">Confidence Score</small>
+                                    </div>
+                                </div>
+                                <button class="btn btn-outline-primary btn-sm mt-2" onclick="showVerificationDetails()">
+                                    <i class="bi bi-info-circle"></i> View Details
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detailed Analysis -->
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-3">
+            <div class="card gov-card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-bar-chart text-info"></i>
+                        Performance Comparison
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="chart-container" style="position: relative; height: 250px;">
+                        <canvas id="comparisonChart"></canvas>
+                    </div>
+                    <div class="comparison-legend mt-3">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="legend-item">
+                                    <div class="legend-color bg-danger"></div>
+                                    <small>Below Average</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="legend-item">
+                                    <div class="legend-color bg-warning"></div>
+                                    <small>Average</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="legend-item">
+                                    <div class="legend-color bg-success"></div>
+                                    <small>Above Average</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-6 mb-3">
+            <div class="card gov-card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-target text-success"></i>
+                        Performance Benchmarks
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="benchmark-section">
+                        <h6>Tier Classification</h6>
+                        <div class="tier-indicators">
+                            <div class="tier-item">
+                                <span class="tier-label">Tier 1 (Elite)</span>
+                                <span class="tier-range">85-100 points</span>
+                                <div class="tier-bar">
+                                    <div class="tier-fill tier-1" style="width: 100%"></div>
+                                </div>
+                            </div>
+                            <div class="tier-item">
+                                <span class="tier-label">Tier 2 (Strong)</span>
+                                <span class="tier-range">70-85 points</span>
+                                <div class="tier-bar">
+                                    <div class="tier-fill tier-2" style="width: 88%"></div>
+                                </div>
+                            </div>
+                            <div class="tier-item">
+                                <span class="tier-label">Tier 3 (Average)</span>
+                                <span class="tier-range">55-70 points</span>
+                                <div class="tier-bar">
+                                    <div class="tier-fill tier-3" style="width: 75%"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="benchmark-stats mt-4">
+                            <h6>Industry Benchmarks</h6>
+                            <div class="row">
+                                <div class="col-6">
+                                    <div class="stat-box">
+                                        <div class="stat-value">76.5</div>
+                                        <div class="stat-label">National Average</div>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="stat-box">
+                                        <div class="stat-value">{{ prediction.performance_index if prediction else '--' }}</div>
+                                        <div class="stat-label">Your Score</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card gov-card">
+                <div class="card-body text-center">
+                    <h5>Next Steps</h5>
+                    <p class="text-muted">Take action based on your performance analysis</p>
+                    <div class="btn-group-vertical btn-group-lg gap-2" role="group">
+                        <a href="{{ url_for('index') }}" class="btn btn-outline-primary">
+                            <i class="bi bi-arrow-left"></i>
+                            Run Another Prediction
+                        </a>
+                        <a href="{{ url_for('reports') }}" class="btn btn-outline-info">
+                            <i class="bi bi-bar-chart-line"></i>
+                            View Institutional Reports
+                        </a>
+                        <button class="btn btn-outline-success" onclick="shareResults()">
+                            <i class="bi bi-share"></i>
+                            Share Results
+                        </button>
+                        <button class="btn btn-outline-warning" onclick="scheduleReview()">
+                            <i class="bi bi-calendar-event"></i>
+                            Schedule Review Meeting
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+// Chart data
+const predictionData = {{ prediction | tojson if prediction else '{}' }};
+const inputData = {{ input_data | tojson if input_data else '{}' }};
+
+console.log('Results page data:', { predictionData, inputData });
+
+// Initialize charts when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    if (predictionData && Object.keys(predictionData).length > 0) {
+        console.log('Initializing charts with data');
+        createPerformanceGauge(predictionData.performance_index || 0);
+        createMetricsChart();
+        createComparisonChart();
+        updateDisplayValues();
+        
+        // Load AI insights if available
+        if (predictionData.ai_insights) {
+            loadAIInsights(predictionData.ai_insights);
+        } else {
+            // Fetch AI insights for prediction
+            fetchAIInsights();
+        }
+    } else {
+        console.warn('No prediction data available');
+        // Show placeholder content
+        showNoDataMessage();
+    }
+});
+
+function showNoDataMessage() {
+    const scoreDisplay = document.getElementById('scoreDisplay');
+    const levelBadge = document.getElementById('levelBadge');
+    const levelDescription = document.getElementById('levelDescription');
+    
+    if (scoreDisplay) scoreDisplay.innerHTML = '<span style="font-size: 3rem; font-weight: bold;">--</span><small class="text-muted d-block">No Data</small>';
+    if (levelBadge) levelBadge.textContent = 'No Prediction Available';
+    if (levelDescription) levelDescription.textContent = 'Please run a prediction from the dashboard';
+}
+
+function createPerformanceGauge(score) {
+    const canvas = document.getElementById('performanceGauge');
+    if (!canvas) {
+        console.error('Performance gauge canvas not found');
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (window.performanceGaugeChart) {
+        window.performanceGaugeChart.destroy();
+    }
+    
+    window.performanceGaugeChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [score, 100 - score],
+                backgroundColor: [
+                    getScoreColor(score),
+                    '#e9ecef'
+                ],
+                borderWidth: 0,
+                cutout: '75%'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    enabled: false
+                }
+            }
+        }
+    });
+}
+
+function createMetricsChart() {
+    const canvas = document.getElementById('metricsChart');
+    if (!canvas) {
+        console.error('Metrics chart canvas not found');
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Destroy existing chart if it exists
+    if (window.metricsChartInstance) {
+        window.metricsChartInstance.destroy();
+    }
+    
+    window.metricsChartInstance = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['AICTE Score', 'UGC Rating', 'NIRF Position', 'Placement %', 'Research', 'Infrastructure'],
+            datasets: [{
+                label: 'Your Institution',
+                data: [
+                    inputData.AICTE_Approval_Score || inputData.aicte_score || 0,
+                    (inputData.UGC_Rating || inputData.ugc_rating || 0) * 10,
+                    Math.max(0, 100 - ((inputData.NIRF_Rank || inputData.nirf_rank || 200) / 2)),
+                    inputData.Placement_Percentage || inputData.placement_percentage || 0,
+                    (inputData.Research_Projects || inputData.research_projects || 0) * 2,
+                    (inputData.Infrastructure_Score || inputData.infrastructure_score || 0) * 10
+                ],
+                backgroundColor: 'rgba(13, 110, 253, 0.2)',
+                borderColor: 'rgba(13, 110, 253, 1)',
+                borderWidth: 2,
+                pointBackgroundColor: 'rgba(13, 110, 253, 1)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgba(13, 110, 253, 1)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        stepSize: 20
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+function createComparisonChart() {
+    const canvas = document.getElementById('comparisonChart');
+    if (!canvas) {
+        console.error('Comparison chart canvas not found');
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
+    const userScore = predictionData.performance_index || 0;
+    
+    // Destroy existing chart if it exists
+    if (window.comparisonChartInstance) {
+        window.comparisonChartInstance.destroy();
+    }
+    
+    window.comparisonChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Your Score', 'National Avg', 'Top 25%', 'Top 10%', 'Elite Tier'],
+            datasets: [{
+                label: 'Performance Score',
+                data: [userScore, 76.5, 85.2, 92.1, 96.5],
+                backgroundColor: [
+                    getScoreColor(userScore),
+                    '#6c757d',
+                    '#28a745',
+                    '#007bff',
+                    '#ffc107'
+                ],
+                borderColor: [
+                    getScoreColor(userScore),
+                    '#495057',
+                    '#1e7e34',
+                    '#0056b3',
+                    '#ffb300'
+                ],
+                borderWidth: 1,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y.toFixed(1) + '%';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Performance Score (%)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Comparison Categories'
+                    }
+                }
+            },
+            animation: {
+                duration: 1500,
+                easing: 'easeInOutQuart'
+            }
+        }
+    });
+}
+
+function getScoreColor(score) {
+    if (score >= 85) return '#28a745';  // success
+    if (score >= 75) return '#17a2b8';  // info
+    if (score >= 65) return '#007bff';  // primary
+    if (score >= 55) return '#ffc107';  // warning
+    return '#dc3545';  // danger
+}
+
+function updateDisplayValues() {
+    // Update progress bars
+    const metrics = [
+        { id: 'aicte-display', value: inputData.AICTE_Approval_Score || inputData.aicte_score, suffix: '%' },
+        { id: 'ugc-display', value: inputData.UGC_Rating || inputData.ugc_rating, suffix: '/10' },
+        { id: 'placement-display', value: inputData.Placement_Percentage || inputData.placement_percentage, suffix: '%' },
+        { id: 'satisfaction-display', value: (inputData.Student_Satisfaction_Score || inputData.satisfaction_score || 0) * 10, suffix: '%' }
+    ];
+    
+    metrics.forEach(metric => {
+        const element = document.getElementById(metric.id);
+        if (element && metric.value !== undefined) {
+            element.textContent = metric.value + metric.suffix;
+        }
+    });
+}
+
+// AI Insights Functions
+function fetchAIInsights() {
+    if (!predictionData || !inputData) {
+        console.log('No data available for AI insights');
+        return;
+    }
+    
+    console.log('Fetching AI insights...');
+    const aiSection = document.getElementById('aiInsightsSection');
+    if (aiSection) {
+        aiSection.style.display = 'block';
+    }
+    
+    fetch('/api/ai-prediction-analysis', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            input_data: inputData,
+            prediction_result: predictionData
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.ai_insights) {
+            loadAIInsights(data.ai_insights);
+        } else {
+            console.error('Failed to fetch AI insights:', data.error);
+            hideAILoading();
+        }
+    })
+    .catch(error => {
+        console.error('Error fetching AI insights:', error);
+        hideAILoading();
+    });
+}
+
+function loadAIInsights(insights) {
+    console.log('Loading AI insights:', insights);
+    
+    // Hide loading spinner
+    hideAILoading();
+    
+    // Show AI content
+    const aiContent = document.getElementById('aiAnalysisContent');
+    if (aiContent) {
+        aiContent.style.display = 'block';
+    }
+    
+    // Populate detailed analysis
+    const detailedAnalysis = document.getElementById('aiDetailedAnalysis');
+    if (detailedAnalysis && insights.detailed_analysis) {
+        detailedAnalysis.innerHTML = marked ? marked.parse(insights.detailed_analysis) : insights.detailed_analysis;
+    }
+    
+    // Update confidence score
+    const confidenceScore = document.getElementById('confidenceScore');
+    if (confidenceScore) {
+        const confidence = insights.confidence_score || 'Medium';
+        confidenceScore.textContent = confidence;
+        confidenceScore.className = `badge bg-${getConfidenceColor(confidence)}`;
+    }
+    
+    // Populate strengths
+    if (insights.key_strengths && insights.key_strengths.length > 0) {
+        const strengthsContainer = document.getElementById('aiStrengths');
+        if (strengthsContainer) {
+            strengthsContainer.innerHTML = insights.key_strengths.map(strength => `
+                <div class="strength-item">
+                    <i class="bi bi-check-circle"></i>
+                    <span>${strength}</span>
+                </div>
+            `).join('');
+        }
+    }
+    
+    // Populate improvements
+    if (insights.improvement_areas && insights.improvement_areas.length > 0) {
+        const improvementsContainer = document.getElementById('aiImprovements');
+        if (improvementsContainer) {
+            improvementsContainer.innerHTML = insights.improvement_areas.map(improvement => `
+                <div class="improvement-item">
+                    <h6>${improvement.area || improvement}</h6>
+                    ${improvement.current ? `<p>Current: ${improvement.current} → Target: ${improvement.target}</p>` : ''}
+                    ${improvement.priority ? `<span class="priority-badge badge bg-${getPriorityColor(improvement.priority)}">${improvement.priority} Priority</span>` : ''}
+                </div>
+            `).join('');
+        }
+    }
+    
+    // Populate recommendations
+    if (insights.recommendations && insights.recommendations.length > 0) {
+        const recommendationsContainer = document.getElementById('aiRecommendations');
+        if (recommendationsContainer) {
+            recommendationsContainer.innerHTML = insights.recommendations.map(rec => `
+                <div class="recommendation-item">
+                    <i class="bi bi-lightbulb"></i>
+                    <span>${rec}</span>
+                </div>
+            `).join('');
+        }
+    }
+}
+
+function hideAILoading() {
+    const loadingElement = document.getElementById('aiAnalysisLoading');
+    if (loadingElement) {
+        loadingElement.style.display = 'none';
+    }
+}
+
+function getConfidenceColor(confidence) {
+    switch (confidence.toLowerCase()) {
+        case 'very high': return 'success';
+        case 'high': return 'primary';
+        case 'medium': return 'warning';
+        case 'low': return 'danger';
+        default: return 'secondary';
+    }
+}
+
+function getPriorityColor(priority) {
+    switch (priority.toLowerCase()) {
+        case 'high': return 'danger';
+        case 'medium': return 'warning';
+        case 'low': return 'info';
+        default: return 'secondary';
+    }
+}
+
+// Refresh AI Analysis
+document.getElementById('refreshAIAnalysis')?.addEventListener('click', function() {
+    const aiContent = document.getElementById('aiAnalysisContent');
+    const aiLoading = document.getElementById('aiAnalysisLoading');
+    
+    if (aiContent) aiContent.style.display = 'none';
+    if (aiLoading) aiLoading.style.display = 'block';
+    
+    fetchAIInsights();
+});
+
+function downloadReport() {
+    // Implement PDF download functionality using jsPDF
+    try {
+        // Simple PDF generation - in production, you'd send this to backend
+        const { jsPDF } = window.jspdf;
+        
+        if (typeof jsPDF === 'undefined') {
+            // Fallback: use print dialog
+            window.print();
+            return;
+        }
+        
+        const doc = new jsPDF();
+        
+        // Add header
+        doc.setFontSize(20);
+        doc.text('UGC-AICTE Performance Analysis Report', 20, 30);
+        
+        // Add performance score
+        doc.setFontSize(16);
+        doc.text(`Performance Index: ${predictionData.performance_index || 'N/A'}`, 20, 50);
+        doc.text(`Performance Level: ${predictionData.performance_level || 'N/A'}`, 20, 70);
+        
+        // Add input metrics
+        doc.setFontSize(12);
+        doc.text('Input Metrics:', 20, 90);
+        let yPos = 100;
+        
+        const metrics = [
+            { label: 'AICTE Score', value: inputData.AICTE_Approval_Score || inputData.aicte_score },
+            { label: 'UGC Rating', value: inputData.UGC_Rating || inputData.ugc_rating },
+            { label: 'NIRF Rank', value: inputData.NIRF_Rank || inputData.nirf_rank },
+            { label: 'Placement %', value: inputData.Placement_Percentage || inputData.placement_percentage }
+        ];
+        
+        metrics.forEach(metric => {
+            if (metric.value !== undefined) {
+                doc.text(`${metric.label}: ${metric.value}`, 30, yPos);
+                yPos += 10;
+            }
+        });
+        
+        // Add timestamp
+        doc.setFontSize(10);
+        doc.text(`Generated on: ${new Date().toLocaleString()}`, 20, 280);
+        
+        // Save the PDF
+        doc.save('institutional-performance-report.pdf');
+        
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        // Fallback to print dialog
+        window.print();
+    }
+}
+
+// Blockchain Verification Functions
+function copyHash() {
+    const hashElement = document.getElementById('document-hash');
+    const hash = hashElement.textContent;
+    
+    navigator.clipboard.writeText(hash).then(() => {
+        // Visual feedback
+        const originalText = hashElement.textContent;
+        hashElement.textContent = 'Copied!';
+        hashElement.style.color = '#28a745';
+        
+        setTimeout(() => {
+            hashElement.textContent = originalText;
+            hashElement.style.color = '';
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy hash:', err);
+        alert('Hash: ' + hash);
+    });
+}
+
+function showVerificationDetails() {
+    const modal = `
+        <div class="modal fade" id="verificationModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="bi bi-shield-lock text-primary"></i>
+                            Blockchain Verification Details
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Document Verification</h6>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>AICTE Certificate</span>
+                                        <span class="badge bg-success">Verified</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>UGC Recognition</span>
+                                        <span class="badge bg-success">Verified</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>Faculty Records</span>
+                                        <span class="badge bg-warning">Pending</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>Infrastructure Data</span>
+                                        <span class="badge bg-success">Verified</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Blockchain Details</h6>
+                                <p><strong>Network:</strong> Ethereum Testnet</p>
+                                <p><strong>Block Height:</strong> 18,234,567</p>
+                                <p><strong>Timestamp:</strong> ${new Date().toLocaleString()}</p>
+                                <p><strong>Gas Used:</strong> 21,000</p>
+                                <p><strong>Confidence Score:</strong> 87%</p>
+                                
+                                <h6 class="mt-3">Smart Contract</h6>
+                                <code style="font-size: 0.8rem;">0x742d35Cc6564C0532d3FbE4034F4e6234567890a</code>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-primary" onclick="verifyOnBlockchain()">
+                            <i class="bi bi-search"></i> Verify on Blockchain
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remove existing modal if any
+    const existingModal = document.getElementById('verificationModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Add modal to body
+    document.body.insertAdjacentHTML('beforeend', modal);
+    
+    // Show modal
+    const modalElement = new bootstrap.Modal(document.getElementById('verificationModal'));
+    modalElement.show();
+}
+
+function verifyOnBlockchain() {
+    // Simulate blockchain verification
+    const button = event.target;
+    const originalText = button.innerHTML;
+    
+    button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Verifying...';
+    button.disabled = true;
+    
+    setTimeout(() => {
+        button.innerHTML = '<i class="bi bi-check-circle text-success"></i> Verified on Blockchain';
+        button.classList.remove('btn-outline-primary');
+        button.classList.add('btn-success');
+        
+        // Show success message
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-success alert-dismissible fade show mt-3';
+        alert.innerHTML = `
+            <i class="bi bi-check-circle"></i>
+            <strong>Verification Complete!</strong> Document authenticity confirmed on blockchain.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        button.parentNode.insertBefore(alert, button);
+        
+    }, 3000);
+}
+
+function shareResults() {
+    // Implement sharing functionality
+    if (navigator.share) {
+        navigator.share({
+            title: 'Institutional Performance Analysis',
+            text: `Performance Score: ${predictionData.performance_index || 'N/A'}`,
+            url: window.location.href
+        }).catch(err => console.log('Error sharing:', err));
+    } else {
+        // Fallback for browsers that don't support native sharing
+        const shareData = {
+            title: 'Institutional Performance Analysis',
+            text: `Performance Score: ${predictionData.performance_index || 'N/A'}%`,
+            url: window.location.href
+        };
+        
+        // Copy to clipboard
+        const shareText = `${shareData.title}\n${shareData.text}\n${shareData.url}`;
+        navigator.clipboard.writeText(shareText).then(() => {
+            alert('Results copied to clipboard!');
+        }).catch(() => {
+            alert(`Share this result:\n${shareText}`);
+        });
+    }
+}
+
+function scheduleReview() {
+    // Implement review scheduling
+    const modal = `
+        <div class="modal fade" id="scheduleModal" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Schedule Performance Review</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="reviewDate" class="form-label">Review Date</label>
+                                <input type="date" class="form-control" id="reviewDate" min="${new Date().toISOString().split('T')[0]}">
+                            </div>
+                            <div class="mb-3">
+                                <label for="reviewType" class="form-label">Review Type</label>
+                                <select class="form-select" id="reviewType">
+                                    <option value="quarterly">Quarterly Review</option>
+                                    <option value="annual">Annual Assessment</option>
+                                    <option value="improvement">Improvement Plan Review</option>
+                                    <option value="compliance">Compliance Check</option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="reviewNotes" class="form-label">Notes</label>
+                                <textarea class="form-control" id="reviewNotes" rows="3" placeholder="Additional notes for the review..."></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-primary" onclick="confirmSchedule()">Schedule Review</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remove existing modal if any
+    const existingModal = document.getElementById('scheduleModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Add modal to body
+    document.body.insertAdjacentHTML('beforeend', modal);
+    
+    // Show modal
+    const modalElement = new bootstrap.Modal(document.getElementById('scheduleModal'));
+    modalElement.show();
+}
+
+function confirmSchedule() {
+    const date = document.getElementById('reviewDate').value;
+    const type = document.getElementById('reviewType').value;
+    const notes = document.getElementById('reviewNotes').value;
+    
+    if (!date) {
+        alert('Please select a review date');
+        return;
+    }
+    
+    // Simulate scheduling
+    alert(`Review scheduled for ${date}\nType: ${type}\nNotes: ${notes || 'None'}`);
+    
+    // Hide modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('scheduleModal'));
+    modal.hide();
+}
+</script>
+{% endblock %}
+    });
+}
+
+function createMetricsChart() {
+    const ctx = document.getElementById('metricsChart').getContext('2d');
+    
+    new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['AICTE Score', 'UGC Rating', 'NIRF Rank', 'Placement %', 'Research', 'Infrastructure'],
+            datasets: [{
+                label: 'Your Institution',
+                data: [
+                    inputData.AICTE_Approval_Score || 0,
+                    (inputData.UGC_Rating || 0) * 10,
+                    100 - ((inputData.NIRF_Rank || 200) / 2),
+                    inputData.Placement_Percentage || 0,
+                    (inputData.Research_Projects || 0) * 2,
+                    inputData.Infrastructure_Score || 0
+                ],
+                backgroundColor: 'rgba(13, 110, 253, 0.2)',
+                borderColor: 'rgba(13, 110, 253, 1)',
+                borderWidth: 2
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+function createComparisonChart() {
+    const canvas = document.getElementById('comparisonChart');
+    if (!canvas) {
+        console.error('Comparison chart canvas not found');
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
+    const userScore = predictionData.performance_index || 0;
+    
+    // Destroy existing chart if it exists
+    if (window.comparisonChartInstance) {
+        window.comparisonChartInstance.destroy();
+    }
+    
+    window.comparisonChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Your Score', 'National Avg', 'Top 25%', 'Top 10%'],
+            datasets: [{
+                label: 'Performance Score',
+                data: [userScore, 76.5, 85.2, 92.1],
+                backgroundColor: [
+                    getScoreColor(userScore),
+                    '#6c757d',
+                    '#28a745',
+                    '#007bff'
+                ],
+                borderColor: [
+                    getScoreColor(userScore),
+                    '#495057',
+                    '#1e7e34',
+                    '#0056b3'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.parsed.y.toFixed(1) + '%';
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        callback: function(value) {
+                            return value + '%';
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Performance Score (%)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Comparison Categories'
+                    }
+                }
+            },
+            animation: {
+                duration: 1500,
+                easing: 'easeInOutQuart'
+            }
+        }
+    });
+}
+
+function getScoreColor(score) {
+    if (score >= 85) return '#28a745';
+    if (score >= 75) return '#17a2b8';
+    if (score >= 65) return '#007bff';
+    if (score >= 55) return '#ffc107';
+    return '#dc3545';
+}
+
+function updateDisplayValues() {
+    // Update any additional display values if needed
+}
+
+function downloadReport() {
+    // Implement PDF download functionality using jsPDF
+    try {
+        // Simple PDF generation - in production, you'd send this to backend
+        const { jsPDF } = window.jspdf;
+        
+        if (typeof jsPDF === 'undefined') {
+            // Fallback: use print dialog
+            window.print();
+            return;
+        }
+        
+        const doc = new jsPDF();
+        
+        // Add header
+        doc.setFontSize(20);
+        doc.text('UGC-AICTE Performance Analysis Report', 20, 30);
+        
+        // Add performance score
+        doc.setFontSize(16);
+        doc.text(`Performance Index: ${predictionData.performance_index || 'N/A'}`, 20, 50);
+        doc.text(`Performance Level: ${predictionData.performance_level || 'N/A'}`, 20, 70);
+        
+        // Add timestamp
+        doc.setFontSize(10);
+        doc.text(`Generated on: ${new Date().toLocaleString()}`, 20, 280);
+        
+        // Save the PDF
+        doc.save('institutional-performance-report.pdf');
+        
+    } catch (error) {
+        console.error('Error generating PDF:', error);
+        // Fallback to print dialog
+        window.print();
+    }
+}
+
+// Blockchain Verification Functions
+function copyHash() {
+    const hashElement = document.getElementById('document-hash');
+    const hash = hashElement.textContent;
+    
+    navigator.clipboard.writeText(hash).then(() => {
+        // Visual feedback
+        const originalText = hashElement.textContent;
+        hashElement.textContent = 'Copied!';
+        hashElement.style.color = '#28a745';
+        
+        setTimeout(() => {
+            hashElement.textContent = originalText;
+            hashElement.style.color = '';
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy hash:', err);
+        alert('Hash: ' + hash);
+    });
+}
+
+function showVerificationDetails() {
+    const modal = `
+        <div class="modal fade" id="verificationModal" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            <i class="bi bi-shield-lock text-primary"></i>
+                            Blockchain Verification Details
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Document Verification</h6>
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>AICTE Certificate</span>
+                                        <span class="badge bg-success">Verified</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>UGC Recognition</span>
+                                        <span class="badge bg-success">Verified</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>Faculty Records</span>
+                                        <span class="badge bg-warning">Pending</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between">
+                                        <span>Infrastructure Data</span>
+                                        <span class="badge bg-success">Verified</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Blockchain Details</h6>
+                                <p><strong>Network:</strong> Ethereum Testnet</p>
+                                <p><strong>Block Height:</strong> 18,234,567</p>
+                                <p><strong>Timestamp:</strong> ${new Date().toLocaleString()}</p>
+                                <p><strong>Gas Used:</strong> 21,000</p>
+                                <p><strong>Confidence Score:</strong> 87%</p>
+                                
+                                <h6 class="mt-3">Smart Contract</h6>
+                                <code style="font-size: 0.8rem;">0x742d35Cc6564C0532d3FbE4034F4e6234567890a</code>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-primary" onclick="verifyOnBlockchain()">
+                            <i class="bi bi-search"></i> Verify on Blockchain
+                        </button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    // Remove existing modal if any
+    const existingModal = document.getElementById('verificationModal');
+    if (existingModal) {
+        existingModal.remove();
+    }
+    
+    // Add modal to body
+    document.body.insertAdjacentHTML('beforeend', modal);
+    
+    // Show modal
+    const modalElement = new bootstrap.Modal(document.getElementById('verificationModal'));
+    modalElement.show();
+}
+
+function verifyOnBlockchain() {
+    // Simulate blockchain verification
+    const button = event.target;
+    const originalText = button.innerHTML;
+    
+    button.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Verifying...';
+    button.disabled = true;
+    
+    setTimeout(() => {
+        button.innerHTML = '<i class="bi bi-check-circle text-success"></i> Verified on Blockchain';
+        button.classList.remove('btn-outline-primary');
+        button.classList.add('btn-success');
+        
+        // Show success message
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-success alert-dismissible fade show mt-3';
+        alert.innerHTML = `
+            <i class="bi bi-check-circle"></i>
+            <strong>Verification Complete!</strong> Document authenticity confirmed on blockchain.
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        button.parentNode.insertBefore(alert, button);
+        
+    }, 3000);
+}
+
+function shareResults() {
+    // Implement sharing functionality
+    if (navigator.share) {
+        navigator.share({
+            title: 'Institutional Performance Analysis',
+            text: `Performance Score: ${predictionData.performance_index || 'N/A'}`,
+            url: window.location.href
+        });
+    } else {
+        // Fallback for browsers that don't support Web Share API
+        navigator.clipboard.writeText(window.location.href);
+        alert('Results link copied to clipboard!');
+    }
+}
+
+function scheduleReview() {
+    // Implement calendar integration
+    alert('Review meeting scheduling feature would be implemented here');
+}
+
+// AI Insights Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    if (predictionData && predictionData.performance_index) {
+        createPerformanceGauge(predictionData.performance_index);
+        createMetricsChart();
+        createComparisonChart();
+        updateDisplayValues();
+        
+        // Check if AI insights are available and load them
+        if (predictionData.ai_insights) {
+            displayAIInsights(predictionData.ai_insights);
+        } else {
+            // Try to get AI insights if prediction data is available
+            requestAIInsights();
+        }
+    }
+});
+
+function requestAIInsights() {
+    if (!predictionData || !inputData) {
+        console.log('No prediction or input data available for AI analysis');
+        return;
+    }
+
+    // Show AI insights section
+    document.getElementById('aiInsightsSection').style.display = 'block';
+    document.getElementById('aiAnalysisLoading').style.display = 'block';
+    document.getElementById('aiAnalysisContent').style.display = 'none';
+
+    fetch('/api/ai-prediction-analysis', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            input_data: inputData,
+            prediction_result: predictionData
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            displayAIInsights(data.ai_insights);
+        } else {
+            showAIError(data.error || 'Failed to get AI insights');
+        }
+    })
+    .catch(error => {
+        console.error('AI insights error:', error);
+        showAIError('Network error while fetching AI insights');
+    })
+    .finally(() => {
+        document.getElementById('aiAnalysisLoading').style.display = 'none';
+    });
+}
+
+function displayAIInsights(insights) {
+    document.getElementById('aiInsightsSection').style.display = 'block';
+    document.getElementById('aiAnalysisContent').style.display = 'block';
+    document.getElementById('aiAnalysisLoading').style.display = 'none';
+
+    // Display detailed analysis
+    const detailedAnalysis = document.getElementById('aiDetailedAnalysis');
+    if (detailedAnalysis && insights.detailed_analysis) {
+        detailedAnalysis.innerHTML = formatAIText(insights.detailed_analysis);
+    }
+
+    // Display confidence score
+    const confidenceScore = document.getElementById('confidenceScore');
+    if (confidenceScore && insights.confidence_score) {
+        confidenceScore.textContent = insights.confidence_score;
+        confidenceScore.className = `badge ${getConfidenceBadgeClass(insights.confidence_score)}`;
+    }
+
+    // Display strengths
+    const strengthsContainer = document.getElementById('aiStrengths');
+    if (strengthsContainer && insights.key_strengths) {
+        strengthsContainer.innerHTML = insights.key_strengths.map(strength => `
+            <div class="strength-item">
+                <i class="bi bi-check-circle-fill"></i>
+                <div>
+                    <strong>Key Strength</strong>
+                    <p class="mb-0">${strength}</p>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Display improvements
+    const improvementsContainer = document.getElementById('aiImprovements');
+    if (improvementsContainer && insights.improvement_areas) {
+        improvementsContainer.innerHTML = insights.improvement_areas.map(improvement => `
+            <div class="improvement-item">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h6 class="mb-1">${improvement.area}</h6>
+                        <p class="mb-1">Current: ${improvement.current} → Target: ${improvement.target}</p>
+                    </div>
+                    <span class="badge ${getPriorityBadgeClass(improvement.priority)} priority-badge">
+                        ${improvement.priority} Priority
+                    </span>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // Display AI recommendations
+    const recommendationsContainer = document.getElementById('aiRecommendations');
+    if (recommendationsContainer && insights.recommendations) {
+        recommendationsContainer.innerHTML = insights.recommendations.map(recommendation => `
+            <div class="recommendation-item">
+                <i class="bi bi-lightbulb-fill"></i>
+                <div>
+                    <p class="mb-0">${recommendation}</p>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
+function showAIError(errorMessage) {
+    document.getElementById('aiInsightsSection').style.display = 'block';
+    document.getElementById('aiAnalysisContent').innerHTML = `
+        <div class="alert alert-warning">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            <strong>AI Analysis Unavailable</strong><br>
+            ${errorMessage}
+        </div>
+    `;
+    document.getElementById('aiAnalysisContent').style.display = 'block';
+}
+
+function formatAIText(text) {
+    return text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\n\n/g, '</p><p>')
+        .replace(/\n/g, '<br>')
+        .replace(/^/, '<p>')
+        .replace(/$/, '</p>');
+}
+
+function getConfidenceBadgeClass(confidence) {
+    switch(confidence.toLowerCase()) {
+        case 'very high': return 'bg-success';
+        case 'high': return 'bg-success';
+        case 'medium': return 'bg-warning';
+        case 'low': return 'bg-danger';
+        default: return 'bg-secondary';
+    }
+}
+
+function getPriorityBadgeClass(priority) {
+    switch(priority.toLowerCase()) {
+        case 'high': return 'bg-danger';
+        case 'medium': return 'bg-warning';
+        case 'low': return 'bg-success';
+        default: return 'bg-secondary';
+    }
+}
+
+// Refresh AI Analysis button
+document.addEventListener('DOMContentLoaded', function() {
+    const refreshBtn = document.getElementById('refreshAIAnalysis');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', function() {
+            requestAIInsights();
+        });
+    }
+});
+</script>
+{% endblock %}

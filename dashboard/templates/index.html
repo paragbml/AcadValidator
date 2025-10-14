@@ -1,0 +1,1693 @@
+{% extends "base.html" %}
+
+{% block title %}Home - UGC-AICTE Institutional Performance Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Hero Section Styles */
+    .hero-section {
+        background: linear-gradient(135deg, #002D62 0%, #0088cc 100%);
+        color: white;
+        padding: 60px 0;
+        border-radius: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .hero-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .hero-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-bottom: 30px;
+        line-height: 1.6;
+    }
+    
+    .hero-stats {
+        margin-top: 40px;
+    }
+    
+    .stat-card {
+        background: rgba(255,255,255,0.1);
+        border-radius: 15px;
+        padding: 20px;
+        margin: 10px 0;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255,255,255,0.2);
+        transition: all 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        background: rgba(255,255,255,0.2);
+    }
+    
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 5px;
+        color: white !important;
+    }
+    
+    .stat-label {
+        font-size: 0.9rem;
+        opacity: 0.8;
+        margin-bottom: 0;
+        color: white;
+    }
+    
+    /* Card Title and Text Color Fixes */
+    .card-title {
+        color: #343a40 !important;
+    }
+    
+    .card-header {
+        background: linear-gradient(135deg, #002D62 0%, #0088cc 100%) !important;
+        border-bottom: none !important;
+        color: white !important;
+    }
+    
+    .card-header .card-title {
+        color: white !important;
+        margin-bottom: 0;
+    }
+    
+    .card-header i {
+        color: rgba(255, 255, 255, 0.9) !important;
+    }
+    
+    .text-primary {
+        color: #0088cc !important;
+    }
+    
+    /* Ensure card content is visible */
+    .card {
+        color: #333 !important;
+    }
+    
+    /* Government Card Styles */
+    .gov-card {
+        border: none;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+    
+    .gov-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+    }
+    
+    .gov-card .card-header {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-bottom: 2px solid #e9ecef;
+        padding: 20px;
+    }
+    
+    .gov-card .card-body {
+        padding: 25px;
+    }
+    
+    .performance-metric {
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+    
+    .metric-circle {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 0.5rem;
+        color: white;
+        font-size: 1rem;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        transition: transform 0.2s ease;
+    }
+    
+    .metric-circle:hover {
+        transform: scale(1.1);
+    }
+    
+    .metric-circle span {
+        font-size: 1rem;
+        font-weight: bold;
+    }
+    
+    .performance-metric small {
+        display: block;
+        font-weight: 500;
+        color: #6c757d;
+        font-size: 0.85rem;
+    }
+    
+    /* New Metric Preview Cards */
+    .metric-preview-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 12px;
+        padding: 20px 15px;
+        text-align: center;
+        transition: all 0.3s ease;
+        border: 1px solid #e9ecef;
+        min-height: 110px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+    
+    .metric-preview-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    }
+    
+    .metric-icon {
+        font-size: 1.8rem;
+        margin-bottom: 8px;
+        opacity: 0.8;
+    }
+    
+    .metric-label {
+        font-size: 0.75rem;
+        color: #6c757d;
+        font-weight: 500;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .metric-value {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #495057;
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+    
+    .analysis-prompt {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 15px;
+        padding: 25px;
+        color: white;
+        margin-top: 20px;
+    }
+    
+    .analysis-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        opacity: 0.9;
+    }
+    
+    .analysis-prompt h5 {
+        color: white !important;
+        font-weight: 600;
+    }
+    
+    .analysis-prompt p {
+        color: rgba(255,255,255,0.9) !important;
+        margin-bottom: 20px;
+    }
+    
+    .analysis-features {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        justify-content: center;
+    }
+    
+    .feature-badge {
+        background: rgba(255,255,255,0.2);
+        border: 1px solid rgba(255,255,255,0.3);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 500;
+        backdrop-filter: blur(10px);
+        transition: all 0.2s ease;
+    }
+    
+    .feature-badge:hover {
+        background: rgba(255,255,255,0.3);
+        transform: scale(1.05);
+    }
+    
+    .feature-badge i {
+        margin-right: 4px;
+        font-size: 0.7rem;
+    }
+    
+    /* Modern Loading Animation */
+    .modern-loader {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        padding: 40px 30px;
+        color: white;
+        margin: 20px 0;
+    }
+    
+    .analysis-steps {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        position: relative;
+    }
+    
+    .analysis-steps::before {
+        content: '';
+        position: absolute;
+        top: 25px;
+        left: 20%;
+        right: 20%;
+        height: 2px;
+        background: rgba(255,255,255,0.3);
+        z-index: 1;
+    }
+    
+    .step-item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+        opacity: 0.5;
+        transition: all 0.3s ease;
+    }
+    
+    .step-item.active {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+    
+    .step-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.3rem;
+        margin-bottom: 10px;
+        transition: all 0.3s ease;
+        border: 2px solid rgba(255,255,255,0.3);
+    }
+    
+    .step-item.active .step-icon {
+        background: rgba(255,255,255,0.9);
+        color: #667eea;
+        border-color: white;
+        animation: pulse 2s infinite;
+    }
+    
+    .step-item span {
+        font-size: 0.8rem;
+        font-weight: 500;
+        text-align: center;
+    }
+    
+    .progress-indicator {
+        text-align: center;
+    }
+    
+    .progress-bar-custom {
+        width: 100%;
+        height: 6px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1);
+        border-radius: 3px;
+        animation: progressMove 3s ease-in-out infinite;
+        width: 0%;
+    }
+    
+    .loading-text {
+        color: rgba(255,255,255,0.9);
+        font-size: 1rem;
+        font-weight: 500;
+        margin: 15px 0;
+    }
+    
+    .loading-dots {
+        display: flex;
+        justify-content: center;
+        gap: 5px;
+    }
+    
+    .loading-dots span {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.7);
+        animation: dotBounce 1.4s ease-in-out infinite both;
+    }
+    
+    .loading-dots span:nth-child(1) { animation-delay: -0.32s; }
+    .loading-dots span:nth-child(2) { animation-delay: -0.16s; }
+    .loading-dots span:nth-child(3) { animation-delay: 0s; }
+    
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255,255,255,0.4); }
+        50% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(255,255,255,0); }
+    }
+    
+    @keyframes progressMove {
+        0% { width: 0%; }
+        50% { width: 70%; }
+        100% { width: 100%; }
+    }
+    
+    @keyframes dotBounce {
+        0%, 80%, 100% { transform: scale(0); }
+        40% { transform: scale(1); }
+    }
+    
+    /* New Simplified Prediction Ready State */
+    .prediction-ready-state {
+        padding: 40px 20px;
+    }
+    
+    .prediction-icon {
+        font-size: 3.5rem;
+        color: #667eea;
+        margin-bottom: 20px;
+        animation: float 3s ease-in-out infinite;
+    }
+    
+    .analysis-capabilities {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        max-width: 300px;
+        margin: 0 auto;
+    }
+    
+    .capability-item {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 12px 20px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 25px;
+        transition: all 0.3s ease;
+        border: 1px solid rgba(102, 126, 234, 0.1);
+    }
+    
+    .capability-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .capability-item i {
+        font-size: 1.2rem;
+        margin-right: 12px;
+        width: 24px;
+        text-align: center;
+    }
+    
+    .capability-item span {
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+    
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+    
+    /* Prediction Results Styles */
+    .prediction-success {
+        padding: 20px;
+    }
+    
+    .performance-score-display {
+        margin: 20px 0;
+    }
+    
+    .score-circle {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto;
+        position: relative;
+        background: conic-gradient(#0088cc 0deg, #0088cc 180deg, #e9ecef 180deg);
+    }
+    
+    .score-inner {
+        width: 90px;
+        height: 90px;
+        background: white;
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+    
+    .score-number {
+        font-size: 1.8rem;
+        color: #002D62;
+        font-weight: 700;
+    }
+    
+    .score-suffix {
+        font-size: 0.8rem;
+        color: #6c757d;
+    }
+    
+    .recommendations-section {
+        margin-top: 20px;
+        text-align: left;
+    }
+    
+    .recommendations-section h6 {
+        color: #002D62;
+        font-weight: 600;
+        margin-bottom: 15px;
+    }
+    
+    .recommendation-item {
+        display: flex;
+        align-items: flex-start;
+        margin-bottom: 10px;
+        padding: 8px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border-left: 3px solid #28a745;
+    }
+    
+    .recommendation-item i {
+        margin-right: 10px;
+        margin-top: 2px;
+        flex-shrink: 0;
+    }
+    
+    .recommendation-item span {
+        font-size: 0.9rem;
+        line-height: 1.4;
+        color: #495057;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Hero Section -->
+    <div class="hero-section text-center mb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <h1 class="hero-title">
+                    <i class="bi bi-graph-up-arrow text-primary"></i>
+                    AI-Powered Institutional Analytics
+                </h1>
+                <p class="hero-subtitle">
+                    Advanced machine learning platform for predicting and analyzing higher education institutional performance across India
+                </p>
+                <div class="hero-stats row mt-4">
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <h3 class="stat-number">{{ stats.total_colleges if stats else 150 }}+</h3>
+                            <p class="stat-label">Institutions Analyzed</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <h3 class="stat-number">{{ stats.total_records if stats else 750 }}+</h3>
+                            <p class="stat-label">Data Points</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="stat-card">
+                            <h3 class="stat-number">{{ stats.years_covered|length if stats and stats.years_covered else 5 }}</h3>
+                            <p class="stat-label">Years of Data</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard -->
+    <div class="row">
+        <!-- Prediction Form -->
+        <div class="col-lg-6 mb-4">
+            <div class="card gov-card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-calculator text-primary"></i>
+                        Performance Prediction
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form id="predictionForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="aicte_score" class="form-label">AICTE Approval Score</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="aicte_score" name="aicte_score"
+                                           min="40" max="100" step="0.1" value="75" required>
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <div class="form-range-container mt-2">
+                                    <input type="range" class="form-range" id="aicte_range" 
+                                           min="40" max="100" step="0.1" value="75">
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="ugc_rating" class="form-label">UGC Rating</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="ugc_rating" name="ugc_rating"
+                                           min="3" max="10" step="0.1" value="7" required>
+                                    <span class="input-group-text">/10</span>
+                                </div>
+                                <div class="form-range-container mt-2">
+                                    <input type="range" class="form-range" id="ugc_range" 
+                                           min="3" max="10" step="0.1" value="7">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="nirf_rank" class="form-label">NIRF Rank</label>
+                                <input type="number" class="form-control" id="nirf_rank" name="nirf_rank"
+                                       min="1" max="200" value="50" required>
+                                <div class="form-range-container mt-2">
+                                    <input type="range" class="form-range" id="nirf_range" 
+                                           min="1" max="200" value="50">
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="placement_percentage" class="form-label">Placement Percentage</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="placement_percentage" name="placement_percentage"
+                                           min="25" max="100" step="0.1" value="70" required>
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <div class="form-range-container mt-2">
+                                    <input type="range" class="form-range" id="placement_range" 
+                                           min="25" max="100" step="0.1" value="70">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="faculty_ratio" class="form-label">Faculty-Student Ratio</label>
+                                <div class="input-group">
+                                    <span class="input-group-text">1:</span>
+                                    <input type="number" class="form-control" id="faculty_ratio" name="faculty_ratio"
+                                           min="8" max="25" step="0.1" value="15" required>
+                                </div>
+                                <div class="form-range-container mt-2">
+                                    <input type="range" class="form-range" id="faculty_range" 
+                                           min="8" max="25" step="0.1" value="15">
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="research_projects" class="form-label">Research Projects</label>
+                                <input type="number" class="form-control" id="research_projects" name="research_projects"
+                                       min="0" max="50" value="15" required>
+                                <div class="form-range-container mt-2">
+                                    <input type="range" class="form-range" id="research_range" 
+                                           min="0" max="50" value="15">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="infrastructure_score" class="form-label">Infrastructure Score</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="infrastructure_score" name="infrastructure_score"
+                                           min="40" max="100" step="0.1" value="75" required>
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <div class="form-range-container mt-2">
+                                    <input type="range" class="form-range" id="infrastructure_range" 
+                                           min="40" max="100" step="0.1" value="75">
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="satisfaction_score" class="form-label">Student Satisfaction</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="satisfaction_score" name="satisfaction_score"
+                                           min="40" max="100" step="0.1" value="75" required>
+                                    <span class="input-group-text">%</span>
+                                </div>
+                                <div class="form-range-container mt-2">
+                                    <input type="range" class="form-range" id="satisfaction_range" 
+                                           min="40" max="100" step="0.1" value="75">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-graph-up"></i>
+                                Predict Performance
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="resetForm()">
+                                <i class="bi bi-arrow-clockwise"></i>
+                                Reset Form
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Panel -->
+        <div class="col-lg-6 mb-4">
+            <div class="card gov-card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-trophy text-warning"></i>
+                        Prediction Results
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="prediction-results" class="text-center">
+                        <div class="placeholder-content">
+                            <div class="prediction-ready-state">
+                                <div class="prediction-icon">
+                                    <i class="bi bi-graph-up-arrow"></i>
+                                </div>
+                                <h4 class="text-primary mb-3">Performance Analysis Ready</h4>
+                                <p class="text-muted mb-4">Fill out the institutional metrics form and click "Predict Performance" to get comprehensive AI-powered analysis</p>
+                                
+                                <div class="analysis-capabilities">
+                                    <div class="capability-item">
+                                        <i class="bi bi-award text-warning"></i>
+                                        <span>NIRF Ranking Prediction</span>
+                                    </div>
+                                    <div class="capability-item">
+                                        <i class="bi bi-lightbulb text-info"></i>
+                                        <span>Improvement Insights</span>
+                                    </div>
+                                    <div class="capability-item">
+                                        <i class="bi bi-star text-success"></i>
+                                        <span>Performance Benchmarking</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="loading-spinner" class="text-center d-none">
+                        <div class="modern-loader">
+                            <div class="loader-animation">
+                                <div class="analysis-steps">
+                                    <div class="step-item active" id="step1">
+                                        <div class="step-icon">
+                                            <i class="bi bi-upload"></i>
+                                        </div>
+                                        <span>Processing Data</span>
+                                    </div>
+                                    <div class="step-item" id="step2">
+                                        <div class="step-icon">
+                                            <i class="bi bi-cpu"></i>
+                                        </div>
+                                        <span>AI Analysis</span>
+                                    </div>
+                                    <div class="step-item" id="step3">
+                                        <div class="step-icon">
+                                            <i class="bi bi-graph-up"></i>
+                                        </div>
+                                        <span>Generating Insights</span>
+                                    </div>
+                                </div>
+                                <div class="progress-indicator">
+                                    <div class="progress-bar-custom">
+                                        <div class="progress-fill"></div>
+                                    </div>
+                                    <p class="loading-text">Analyzing institutional performance...</p>
+                                    <div class="loading-dots">
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card gov-card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-lightning text-warning"></i>
+                        Quick Actions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('detailed_report') }}" class="quick-action-card text-decoration-none">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body text-center">
+                                        <i class="bi bi-bar-chart-line display-4 text-info"></i>
+                                        <h6 class="card-title mt-2">View Detailed Report</h6>
+                                        <p class="card-text small text-muted">Comprehensive analysis with visualizations</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="#" class="quick-action-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#sampleDataModal">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body text-center">
+                                        <i class="bi bi-file-text display-4 text-success"></i>
+                                        <h6 class="card-title mt-2">Sample Data</h6>
+                                        <p class="card-text small text-muted">Load example institutional data</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="{{ url_for('quality_assistant') }}" class="quick-action-card text-decoration-none">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body text-center">
+                                        <i class="bi bi-shield-check display-4 text-warning"></i>
+                                        <h6 class="card-title mt-2">Quality Assistant</h6>
+                                        <p class="card-text small text-muted">AI-powered data quality analysis</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <a href="#" class="quick-action-card text-decoration-none" data-bs-toggle="modal" data-bs-target="#helpModal">
+                                <div class="card h-100 border-0 shadow-sm">
+                                    <div class="card-body text-center">
+                                        <i class="bi bi-question-circle display-4 text-warning"></i>
+                                        <h6 class="card-title mt-2">Help Guide</h6>
+                                        <p class="card-text small text-muted">Learn how to use the portal</p>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Statistics -->
+    <div class="row mt-4">
+        <div class="col-md-6 mb-4">
+            <div class="card gov-card h-100">
+                <div class="card-header bg-gradient text-white" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-bar-chart-fill me-2"></i>
+                        Performance Distribution
+                    </h5>
+                    <small class="opacity-75">Institutional Performance Analytics</small>
+                </div>
+                <div class="card-body p-4">
+                    <!-- Performance Distribution Overview -->
+                    <div class="mb-4">
+                        <div class="alert alert-info border-0 bg-light py-2 px-3">
+                            <i class="bi bi-info-circle text-info me-2"></i>
+                            <small class="text-muted">Distribution across Indian higher education institutions (2019-2023)</small>
+                        </div>
+                    </div>
+                    
+                    <!-- Enhanced Chart Container -->
+                    <div class="row g-4">
+                        <div class="col-md-7">
+                            <div class="chart-wrapper position-relative bg-light rounded p-3">
+                                <canvas id="performanceDistributionChart" width="280" height="280"></canvas>
+                                <!-- Chart Labels Overlay -->
+                                <div class="chart-labels position-absolute top-50 start-50 translate-middle text-center">
+                                    <div class="chart-center-text">
+                                        <div class="fw-bold text-primary fs-4">750</div>
+                                        <small class="text-muted">Total Institutions</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <!-- Enhanced Performance Metrics -->
+                            <div class="performance-legend h-100 d-flex flex-column">
+                                <div class="legend-item mb-2 p-2 rounded border bg-white">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                            <div class="legend-dot bg-success me-2"></div>
+                                            <div>
+                                                <div class="fw-semibold small">Excellent</div>
+                                                <small class="text-muted">85-100%</small>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="fw-bold text-success">{{ stats.performance_distribution.excellent or 45 }}</div>
+                                            <small class="text-muted">{{ ((stats.performance_distribution.excellent or 45) / 750 * 100)|round(1) }}%</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="legend-item mb-2 p-2 rounded border bg-white">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                            <div class="legend-dot bg-info me-2"></div>
+                                            <div>
+                                                <div class="fw-semibold small">Very Good</div>
+                                                <small class="text-muted">75-84%</small>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="fw-bold text-info">{{ stats.performance_distribution.very_good or 62 }}</div>
+                                            <small class="text-muted">{{ ((stats.performance_distribution.very_good or 62) / 750 * 100)|round(1) }}%</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="legend-item mb-2 p-2 rounded border bg-white">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                            <div class="legend-dot bg-primary me-2"></div>
+                                            <div>
+                                                <div class="fw-semibold small">Good</div>
+                                                <small class="text-muted">65-74%</small>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="fw-bold text-primary">{{ stats.performance_distribution.good or 38 }}</div>
+                                            <small class="text-muted">{{ ((stats.performance_distribution.good or 38) / 750 * 100)|round(1) }}%</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="legend-item mb-2 p-2 rounded border bg-white">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                            <div class="legend-dot bg-warning me-2"></div>
+                                            <div>
+                                                <div class="fw-semibold small">Average</div>
+                                                <small class="text-muted">55-64%</small>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="fw-bold text-warning">{{ stats.performance_distribution.average or 28 }}</div>
+                                            <small class="text-muted">{{ ((stats.performance_distribution.average or 28) / 750 * 100)|round(1) }}%</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="legend-item p-2 rounded border bg-white">
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <div class="d-flex align-items-center">
+                                            <div class="legend-dot bg-danger me-2"></div>
+                                            <div>
+                                                <div class="fw-semibold small">Needs Work</div>
+                                                <small class="text-muted">Below 55%</small>
+                                            </div>
+                                        </div>
+                                        <div class="text-end">
+                                            <div class="fw-bold text-danger">{{ stats.performance_distribution.needs_improvement or 15 }}</div>
+                                            <small class="text-muted">{{ ((stats.performance_distribution.needs_improvement or 15) / 750 * 100)|round(1) }}%</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Enhanced Key Insights -->
+                    <div class="insights-section mt-4">
+                        <div class="row g-3">
+                            <div class="col-6">
+                                <div class="insight-card p-3 rounded border-start border-success border-3 bg-light">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-trophy text-success me-2"></i>
+                                        <div>
+                                            <div class="fw-bold text-success">{{ ((stats.performance_distribution.excellent or 45) + (stats.performance_distribution.very_good or 62)) }}</div>
+                                            <small class="text-muted">High Performers (75%+)</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-6">
+                                <div class="insight-card p-3 rounded border-start border-info border-3 bg-light">
+                                    <div class="d-flex align-items-center">
+                                        <i class="bi bi-graph-up text-info me-2"></i>
+                                        <div>
+                                            <div class="fw-bold text-info">{{ ((stats.performance_distribution.needs_improvement or 15) / 750 * 100)|round(1) }}%</div>
+                                            <small class="text-muted">Need Improvement</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6 mb-4">
+            <div class="card gov-card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-diagram-3 text-primary"></i>
+                        Institution Tier Breakdown
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if stats %}
+                    <!-- Tier Chart Container -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <canvas id="tierDistributionChart" width="250" height="250"></canvas>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="tier-stats">
+                                <div class="tier-stat-item mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div class="tier-info">
+                                            <i class="bi bi-award text-warning me-2"></i>
+                                            <strong>Tier 1</strong>
+                                            <br><small class="text-muted">IITs, Top NITs, IIITs</small>
+                                        </div>
+                                        <span class="tier-count badge bg-warning text-dark">25</span>
+                                    </div>
+                                    <div class="tier-progress">
+                                        <div class="progress" style="height: 6px;">
+                                            <div class="progress-bar bg-warning" style="width: 17%"></div>
+                                        </div>
+                                        <small class="text-muted">17% of total institutions</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="tier-stat-item mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div class="tier-info">
+                                            <i class="bi bi-star text-info me-2"></i>
+                                            <strong>Tier 2</strong>
+                                            <br><small class="text-muted">NITs, Private Universities</small>
+                                        </div>
+                                        <span class="tier-count badge bg-info">50</span>
+                                    </div>
+                                    <div class="tier-progress">
+                                        <div class="progress" style="height: 6px;">
+                                            <div class="progress-bar bg-info" style="width: 33%"></div>
+                                        </div>
+                                        <small class="text-muted">33% of total institutions</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="tier-stat-item mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div class="tier-info">
+                                            <i class="bi bi-building text-secondary me-2"></i>
+                                            <strong>Tier 3</strong>
+                                            <br><small class="text-muted">State Universities, Colleges</small>
+                                        </div>
+                                        <span class="tier-count badge bg-secondary">75</span>
+                                    </div>
+                                    <div class="tier-progress">
+                                        <div class="progress" style="height: 6px;">
+                                            <div class="progress-bar bg-secondary" style="width: 50%"></div>
+                                        </div>
+                                        <small class="text-muted">50% of total institutions</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Summary Card -->
+                    <div class="mt-3 pt-3 border-top">
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="summary-metric">
+                                    <h5 class="text-primary mb-1">150</h5>
+                                    <small class="text-muted">Total Institutions</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="summary-metric">
+                                    <h5 class="text-success mb-1">{{ stats.average_metrics.performance_index if stats.average_metrics else 76.5 }}</h5>
+                                    <small class="text-muted">Avg Performance</small>
+                                </div>
+                            </div>
+                            <div class="col-4">
+                                <div class="summary-metric">
+                                    <h5 class="text-info mb-1">{{ stats.average_metrics.aicte_score if stats.average_metrics else 78.2 }}</h5>
+                                    <small class="text-muted">Avg AICTE Score</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="text-center text-muted">
+                        <i class="bi bi-diagram-3 display-4"></i>
+                        <p class="mt-2">Loading tier breakdown...</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card gov-card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-clock-history text-info"></i>
+                        Recent Activity & Updates
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="activity-feed">
+                                <div class="activity-item">
+                                    <div class="activity-icon bg-success">
+                                        <i class="bi bi-graph-up text-white"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h6>Model Performance Update</h6>
+                                        <p class="text-muted small">AI model accuracy improved to 89.2% with latest training data</p>
+                                        <small class="text-muted">2 hours ago</small>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon bg-info">
+                                        <i class="bi bi-database text-white"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h6>Dataset Updated</h6>
+                                        <p class="text-muted small">2023 institutional performance data added to analysis database</p>
+                                        <small class="text-muted">1 day ago</small>
+                                    </div>
+                                </div>
+                                <div class="activity-item">
+                                    <div class="activity-icon bg-warning">
+                                        <i class="bi bi-award text-white"></i>
+                                    </div>
+                                    <div class="activity-content">
+                                        <h6>NIRF Rankings Integration</h6>
+                                        <p class="text-muted small">Latest NIRF 2024 rankings integrated for better analysis</p>
+                                        <small class="text-muted">3 days ago</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="announcement-card">
+                                <h6><i class="bi bi-megaphone text-primary"></i> Announcements</h6>
+                                <div class="announcement-item">
+                                    <h6 class="small">Portal Maintenance</h6>
+                                    <p class="small text-muted">Scheduled maintenance on Sunday 2-4 AM for performance improvements</p>
+                                </div>
+                                <div class="announcement-item">
+                                    <h6 class="small">New Features</h6>
+                                    <p class="small text-muted">Comparative analysis feature coming next month</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sample Data Modal -->
+<div class="modal fade" id="sampleDataModal" tabindex="-1" aria-labelledby="sampleDataModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="sampleDataModalLabel">Load Sample Data</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Choose from sample institutional data profiles:</p>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-outline-primary" onclick="loadSampleData('tier1')">
+                        Tier 1 Institution (IIT/IIIT Level)
+                    </button>
+                    <button class="btn btn-outline-primary" onclick="loadSampleData('tier2')">
+                        Tier 2 Institution (NIT Level)
+                    </button>
+                    <button class="btn btn-outline-primary" onclick="loadSampleData('tier3')">
+                        Tier 3 Institution (State University)
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Help Modal -->
+<div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="helpModalLabel">Portal Usage Guide</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <h6>How to Use Performance Prediction</h6>
+                <ol>
+                    <li>Enter your institutional metrics in the form fields</li>
+                    <li>Use sliders for quick adjustments</li>
+                    <li>Click "Predict Performance" to get AI analysis</li>
+                    <li>Review the performance score and recommendations</li>
+                </ol>
+                
+                <h6>Understanding Metrics</h6>
+                <ul>
+                    <li><strong>AICTE Score:</strong> Approval score from AICTE (40-100)</li>
+                    <li><strong>UGC Rating:</strong> University Grants Commission rating (3-10)</li>
+                    <li><strong>NIRF Rank:</strong> National Institutional Ranking Framework position (1-200)</li>
+                    <li><strong>Placement %:</strong> Percentage of students placed (25-100)</li>
+                </ul>
+                
+                <h6>Performance Levels</h6>
+                <ul>
+                    <li><span class="badge bg-success">Excellent</span> 85-100 points</li>
+                    <li><span class="badge bg-info">Very Good</span> 75-85 points</li>
+                    <li><span class="badge bg-primary">Good</span> 65-75 points</li>
+                    <li><span class="badge bg-warning">Average</span> 55-65 points</li>
+                    <li><span class="badge bg-danger">Needs Improvement</span> Below 55 points</li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Initialize page
+document.addEventListener('DOMContentLoaded', function() {
+    setupRangeSliders();
+    setupFormValidation();
+    setupPredictionForm();
+    initializeCharts();
+});
+
+// Initialize homepage charts
+function initializeCharts() {
+    createPerformanceDistributionChart();
+    createTierDistributionChart();
+}
+
+function createPerformanceDistributionChart() {
+    const canvas = document.getElementById('performanceDistributionChart');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Excellent', 'Very Good', 'Good', 'Average', 'Needs Improvement'],
+            datasets: [{
+                data: [45, 62, 38, 28, 15],
+                backgroundColor: [
+                    '#28a745',
+                    '#17a2b8', 
+                    '#007bff',
+                    '#ffc107',
+                    '#dc3545'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createTierDistributionChart() {
+    const canvas = document.getElementById('tierDistributionChart');
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Tier 1 (Premium)', 'Tier 2 (Good)', 'Tier 3 (Average)'],
+            datasets: [{
+                data: [25, 50, 75],
+                backgroundColor: [
+                    '#ffc107',
+                    '#17a2b8',
+                    '#6c757d'
+                ],
+                borderWidth: 2,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        usePointStyle: true
+                    }
+                }
+            }
+        }
+    });
+}
+
+// Modern loading animation controller
+function showModernLoading() {
+    document.getElementById('prediction-results').classList.add('d-none');
+    document.getElementById('loading-spinner').classList.remove('d-none');
+    
+    // Animate steps
+    let currentStep = 1;
+    const totalSteps = 3;
+    
+    const stepInterval = setInterval(() => {
+        // Remove active from all steps
+        document.querySelectorAll('.step-item').forEach(item => item.classList.remove('active'));
+        
+        // Add active to current step
+        const stepElement = document.getElementById(`step${currentStep}`);
+        if (stepElement) {
+            stepElement.classList.add('active');
+        }
+        
+        currentStep++;
+        if (currentStep > totalSteps) {
+            currentStep = 1; // Loop back to first step
+        }
+    }, 1000);
+    
+    // Store interval ID for cleanup
+    window.loadingInterval = stepInterval;
+}
+
+function hideModernLoading() {
+    document.getElementById('loading-spinner').classList.add('d-none');
+    document.getElementById('prediction-results').classList.remove('d-none');
+    
+    // Clear the loading animation interval
+    if (window.loadingInterval) {
+        clearInterval(window.loadingInterval);
+        window.loadingInterval = null;
+    }
+}
+
+// Setup prediction form
+function setupPredictionForm() {
+    const form = document.getElementById('predictionForm');
+    if (form) {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Show modern loading animation
+            showModernLoading();
+            
+            // Collect form data
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Convert numeric fields
+            const numericFields = [
+                'AICTE_Approval_Score', 'UGC_Rating', 'NIRF_Rank',
+                'Placement_Percentage', 'Faculty_Student_Ratio', 'Research_Projects',
+                'Infrastructure_Score', 'Student_Satisfaction_Score'
+            ];
+            
+            numericFields.forEach(field => {
+                if (data[field]) {
+                    data[field] = parseFloat(data[field]);
+                }
+            });
+            
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Store result for detailed report access
+                    window.lastPredictionResult = result;
+                    window.lastInputData = data; // Store input data too
+                    sessionStorage.setItem('lastPredictionResult', JSON.stringify(result));
+                    sessionStorage.setItem('lastInputData', JSON.stringify(data));
+                    
+                    // Ensure loading screen shows for at least 2 seconds for better UX
+                    setTimeout(() => {
+                        // Hide loading and show results inline
+                        hideModernLoading();
+                        // Update results display
+                        updatePredictionResults(result);
+                        // Show the prediction results card
+                        showPredictionResults(result);
+                    }, 2000);
+                } else {
+                    hideModernLoading();
+                    alert('Prediction failed: ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                hideModernLoading();
+                console.error('Prediction error:', error);
+                alert('Network error. Please try again.');
+            }
+        });
+    }
+}
+
+function updatePredictionResults(result) {
+    // Update the metric preview cards with actual values
+    const prediction = result.prediction || {};
+    
+    // Update NIRF Ranking (assuming it's in the prediction)
+    const nirfElement = document.querySelector('.metric-preview-card:nth-child(1) .metric-value');
+    if (nirfElement && prediction.nirf_rank) {
+        nirfElement.textContent = prediction.nirf_rank;
+    }
+    
+    // Update Placement Rate
+    const placementElement = document.querySelector('.metric-preview-card:nth-child(2) .metric-value');
+    if (placementElement && prediction.placement_rate) {
+        placementElement.textContent = prediction.placement_rate + '%';
+    }
+    
+    // Update Academic Score
+    const academicElement = document.querySelector('.metric-preview-card:nth-child(3) .metric-value');
+    if (academicElement && prediction.overall_score) {
+        academicElement.textContent = prediction.overall_score.toFixed(1);
+    }
+    
+    // Update Student Rating
+    const studentElement = document.querySelector('.metric-preview-card:nth-child(4) .metric-value');
+    if (studentElement && prediction.student_satisfaction) {
+        studentElement.textContent = prediction.student_satisfaction + '/10';
+    }
+}
+
+// Setup range sliders
+function setupRangeSliders() {
+    const ranges = document.querySelectorAll('input[type="range"]');
+    ranges.forEach(range => {
+        const output = document.querySelector(`#${range.id}-display`);
+        if (output) {
+            range.addEventListener('input', function() {
+                output.textContent = this.value;
+            });
+        }
+    });
+}
+
+// Setup form validation
+function setupFormValidation() {
+    const form = document.getElementById('predictionForm');
+    if (form) {
+        const inputs = form.querySelectorAll('input[required]');
+        inputs.forEach(input => {
+            input.addEventListener('blur', function() {
+                if (!this.value) {
+                    this.classList.add('is-invalid');
+                } else {
+                    this.classList.remove('is-invalid');
+                }
+            });
+        });
+    }
+}
+
+// Reset form function
+function resetForm() {
+    const form = document.getElementById('predictionForm');
+    if (form) {
+        form.reset();
+        // Reset any validation classes
+        const inputs = form.querySelectorAll('.is-invalid');
+        inputs.forEach(input => input.classList.remove('is-invalid'));
+        
+        // Reset range slider displays
+        setupRangeSliders();
+    }
+}
+
+// Show prediction results in the results card
+function showPredictionResults(result) {
+    console.log('showPredictionResults called with:', result);
+    
+    let resultsContainer = document.getElementById('prediction-results');
+    if (!resultsContainer) {
+        // Find or create the results card
+        const predictionSection = document.querySelector('.prediction-section');
+        const existingCard = predictionSection?.querySelector('.prediction-results-card');
+        
+        if (existingCard) {
+            resultsContainer = existingCard.querySelector('.card-body') || existingCard;
+        } else {
+            // Create a new results card if it doesn't exist
+            const newCard = document.createElement('div');
+            newCard.className = 'card gov-card prediction-results-card mt-4';
+            newCard.innerHTML = `
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-graph-up text-success"></i>
+                        Prediction Results
+                    </h5>
+                </div>
+                <div class="card-body" id="prediction-results">
+                    <!-- Results will be populated here -->
+                </div>
+            `;
+            
+            if (predictionSection) {
+                predictionSection.appendChild(newCard);
+                resultsContainer = newCard.querySelector('.card-body');
+            }
+        }
+    }
+    
+    // Extract prediction data with fallbacks
+    const prediction = result.prediction || {};
+    const recommendations = result.recommendations || [];
+    
+    // Ensure we have the necessary values with defaults
+    const performanceIndex = prediction.performance_index || 0;
+    const performanceLevel = prediction.performance_level || 'Unknown';
+    const levelDescription = prediction.level_description || 'No description available';
+    const levelColor = prediction.level_color || 'secondary';
+    
+    const resultsHtml = `
+        <div class="prediction-success">
+            <div class="text-center mb-4">
+                <div class="performance-score-display">
+                    <div class="score-circle" style="background: conic-gradient(var(--bs-${levelColor}) 0deg, var(--bs-${levelColor}) ${performanceIndex * 3.6}deg, #e9ecef ${performanceIndex * 3.6}deg);">
+                        <div class="score-inner">
+                            <span class="score-number">${performanceIndex}</span>
+                            <span class="score-suffix">%</span>
+                        </div>
+                    </div>
+                </div>
+                <h4 class="mt-3">${performanceLevel}</h4>
+                <p class="text-muted">${levelDescription}</p>
+                <span class="badge bg-${levelColor} fs-6">${performanceLevel}</span>
+            </div>
+
+            ${recommendations.length > 0 ? `
+            <div class="recommendations-section">
+                <h6><i class="bi bi-lightbulb text-warning"></i> Key Recommendations</h6>
+                <div class="recommendations-list">
+                    ${recommendations.slice(0, 4).map(rec => `
+                        <div class="recommendation-item">
+                            <i class="bi bi-check-circle text-success"></i>
+                            <span>${rec}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            ` : ''}
+
+            <div class="mt-4 text-center">
+                <button class="btn btn-primary" onclick="viewDetailedReport()">
+                    <i class="bi bi-file-text"></i> View Detailed Report
+                </button>
+                <button class="btn btn-outline-secondary" onclick="resetForm()">
+                    <i class="bi bi-arrow-clockwise"></i> New Prediction
+                </button>
+            </div>
+        </div>
+    `;
+    
+    if (resultsContainer) {
+        resultsContainer.innerHTML = resultsHtml;
+        resultsContainer.style.display = 'block';
+        
+        // Make sure the card is visible
+        const card = resultsContainer.closest('.prediction-results-card');
+        if (card) {
+            card.style.display = 'block';
+        }
+        
+        // Scroll to results
+        resultsContainer.scrollIntoView({ behavior: 'smooth' });
+        
+        // Animate score counting
+        const scoreElement = resultsContainer.querySelector('.score-number');
+        if (scoreElement && performanceIndex > 0) {
+            let current = 0;
+            const target = performanceIndex;
+            const increment = target / 50;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    current = target;
+                    clearInterval(timer);
+                }
+                scoreElement.textContent = Math.round(current * 10) / 10;
+            }, 20);
+        }
+    } else {
+        console.error('Could not find or create results container');
+    }
+}
+
+// View detailed report function
+function viewDetailedReport() {
+    // Get the last prediction result from session storage or global variable
+    const lastResult = window.lastPredictionResult || JSON.parse(sessionStorage.getItem('lastPredictionResult') || '{}');
+    
+    if (lastResult && lastResult.success) {
+        // Store prediction data using AJAX POST request to ensure session persistence
+        fetch('/api/store-prediction-data', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                prediction_data: lastResult,
+                input_data: window.lastInputData || JSON.parse(sessionStorage.getItem('lastInputData') || '{}')
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Navigate to detailed report page
+                window.location.href = '/detailed-report';
+            } else {
+                alert('Failed to store prediction data. Please try again.');
+            }
+        })
+        .catch(error => {
+            console.error('Error storing prediction data:', error);
+            // Try direct navigation as fallback
+            window.location.href = '/detailed-report';
+        });
+    } else {
+        alert('No prediction data available. Please run a prediction first.');
+    }
+}
+
+// Load sample data function
+function loadSampleData(tier) {
+    const sampleData = {
+        tier1: {
+            AICTE_Approval_Score: 9.5,
+            UGC_Rating: 9.2,
+            NIRF_Rank: 25,
+            Placement_Percentage: 95,
+            Faculty_Student_Ratio: 1.15,
+            Research_Projects: 150,
+            Infrastructure_Score: 9.0,
+            Student_Satisfaction_Score: 8.8
+        },
+        tier2: {
+            AICTE_Approval_Score: 8.0,
+            UGC_Rating: 7.5,
+            NIRF_Rank: 100,
+            Placement_Percentage: 80,
+            Faculty_Student_Ratio: 1.20,
+            Research_Projects: 75,
+            Infrastructure_Score: 7.5,
+            Student_Satisfaction_Score: 7.5
+        },
+        tier3: {
+            AICTE_Approval_Score: 6.5,
+            UGC_Rating: 6.0,
+            NIRF_Rank: 200,
+            Placement_Percentage: 60,
+            Faculty_Student_Ratio: 1.30,
+            Research_Projects: 25,
+            Infrastructure_Score: 6.0,
+            Student_Satisfaction_Score: 6.5
+        }
+    };
+    
+    const data = sampleData[tier];
+    if (data) {
+        Object.keys(data).forEach(key => {
+            const input = document.querySelector(`[name="${key}"]`);
+            if (input) {
+                input.value = data[key];
+                // Trigger input event to update displays
+                input.dispatchEvent(new Event('input'));
+            }
+        });
+    }
+}
+</script>
+{% endblock %}

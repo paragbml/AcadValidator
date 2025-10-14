@@ -1,0 +1,543 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} - UGC AICTE Portal{% endblock %}
+
+{% block custom_css %}
+<style>
+    .report-dashboard {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px 0;
+    }
+    
+    .report-header {
+        background: rgba(255,255,255,0.95);
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        backdrop-filter: blur(10px);
+    }
+    
+    .report-section {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    
+    .report-type-card {
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-align: center;
+    }
+    
+    .report-type-card:hover {
+        border-color: #667eea;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+    }
+    
+    .report-type-card.active {
+        border-color: #667eea;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .report-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        color: #667eea;
+    }
+    
+    .report-type-card.active .report-icon {
+        color: white;
+    }
+    
+    .generation-progress {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 12px;
+        padding: 30px;
+        text-align: center;
+        display: none;
+    }
+    
+    .progress-step {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    
+    .progress-step i {
+        font-size: 1.5rem;
+        margin-right: 10px;
+        color: #667eea;
+    }
+    
+    .progress-animation {
+        width: 100px;
+        height: 100px;
+        border: 5px solid #e9ecef;
+        border-top: 5px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    
+    .report-preview {
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 20px;
+        background: #f8f9fa;
+        display: none;
+    }
+    
+    .report-section-title {
+        color: #667eea;
+        font-weight: 600;
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+        border-bottom: 2px solid #e9ecef;
+    }
+    
+    .metric-highlight {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 500;
+        margin: 5px;
+        display: inline-block;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{{ url_for('index') }}">Dashboard</a></li>
+<li class="breadcrumb-item active" aria-current="page">AI Report Generation</li>
+{% endblock %}
+
+{% block content %}
+<div class="report-dashboard">
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="report-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-3">
+                        <i class="bi bi-file-earmark-text text-primary"></i>
+                        AI Report Generation
+                    </h1>
+                    <p class="lead mb-0">Generate comprehensive performance reports powered by advanced AI analysis</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="ai-badge">
+                        <i class="bi bi-robot"></i>
+                        <span>Gemini AI Powered</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Type Selection -->
+        <div class="report-section">
+            <h5 class="mb-4">Select Report Type</h5>
+            <div class="row">
+                <div class="col-md-3">
+                    <div class="report-type-card" data-type="institutional">
+                        <div class="report-icon">
+                            <i class="bi bi-building"></i>
+                        </div>
+                        <h6>Institutional Performance</h6>
+                        <p class="small text-muted">Comprehensive analysis of single institution</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="report-type-card" data-type="comparative">
+                        <div class="report-icon">
+                            <i class="bi bi-bar-chart"></i>
+                        </div>
+                        <h6>Comparative Analysis</h6>
+                        <p class="small text-muted">Compare multiple institutions</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="report-type-card" data-type="state">
+                        <div class="report-icon">
+                            <i class="bi bi-geo-alt"></i>
+                        </div>
+                        <h6>State-wise Report</h6>
+                        <p class="small text-muted">Regional performance analysis</p>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="report-type-card" data-type="trend">
+                        <div class="report-icon">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <h6>Trend Analysis</h6>
+                        <p class="small text-muted">Historical performance trends</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Report Configuration -->
+        <div class="report-section" id="reportConfig">
+            <h5 class="mb-4">Report Configuration</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Report Title</label>
+                        <input type="text" class="form-control" id="reportTitle" placeholder="Enter custom report title">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Institution Name (for institutional reports)</label>
+                        <input type="text" class="form-control" id="institutionName" placeholder="Enter institution name">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Analysis Period</label>
+                        <select class="form-select" id="analysisPeriod">
+                            <option value="current">Current Year (2023-24)</option>
+                            <option value="3year">Last 3 Years</option>
+                            <option value="5year">Last 5 Years</option>
+                            <option value="all">All Available Data</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label">Report Sections</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="includeExecutiveSummary" checked>
+                            <label class="form-check-label" for="includeExecutiveSummary">Executive Summary</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="includePerformanceMetrics" checked>
+                            <label class="form-check-label" for="includePerformanceMetrics">Performance Metrics</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="includeRecommendations" checked>
+                            <label class="form-check-label" for="includeRecommendations">AI Recommendations</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="includeBenchmarking" checked>
+                            <label class="form-check-label" for="includeBenchmarking">Benchmarking Analysis</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="includeVisualizations" checked>
+                            <label class="form-check-label" for="includeVisualizations">Charts & Visualizations</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="text-center mt-4">
+                <button class="btn btn-primary btn-lg" onclick="generateReport()">
+                    <i class="bi bi-magic"></i>
+                    Generate AI Report
+                </button>
+            </div>
+        </div>
+
+        <!-- Generation Progress -->
+        <div class="report-section generation-progress" id="generationProgress">
+            <h5 class="mb-4">Generating Your Report...</h5>
+            <div class="progress-animation"></div>
+            <div id="progressSteps">
+                <div class="progress-step">
+                    <i class="bi bi-database"></i>
+                    <span>Analyzing institutional data...</span>
+                </div>
+            </div>
+            <p class="text-muted">This may take a few minutes. Please don't close this page.</p>
+        </div>
+
+        <!-- Report Preview -->
+        <div class="report-section report-preview" id="reportPreview">
+            <div class="row">
+                <div class="col-md-9">
+                    <div id="reportContent">
+                        <!-- Generated report content will appear here -->
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="sticky-top">
+                        <h6>Download Options</h6>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary" onclick="downloadPDF()">
+                                <i class="bi bi-file-pdf"></i> Download PDF
+                            </button>
+                            <button class="btn btn-outline-primary" onclick="downloadWord()">
+                                <i class="bi bi-file-word"></i> Download Word
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="downloadExcel()">
+                                <i class="bi bi-file-excel"></i> Download Excel
+                            </button>
+                        </div>
+                        
+                        <hr class="my-3">
+                        
+                        <h6>Share Report</h6>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-info" onclick="shareReport()">
+                                <i class="bi bi-share"></i> Share Link
+                            </button>
+                            <button class="btn btn-outline-success" onclick="emailReport()">
+                                <i class="bi bi-envelope"></i> Email Report
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block custom_js %}
+<script>
+let selectedReportType = null;
+let generatedReport = null;
+
+document.addEventListener('DOMContentLoaded', function() {
+    setupReportTypeSelection();
+});
+
+function setupReportTypeSelection() {
+    document.querySelectorAll('.report-type-card').forEach(card => {
+        card.addEventListener('click', function() {
+            document.querySelectorAll('.report-type-card').forEach(c => c.classList.remove('active'));
+            this.classList.add('active');
+            selectedReportType = this.dataset.type;
+            updateConfigurationSection();
+        });
+    });
+}
+
+function updateConfigurationSection() {
+    const configSection = document.getElementById('reportConfig');
+    configSection.style.display = selectedReportType ? 'block' : 'none';
+}
+
+async function generateReport() {
+    if (!selectedReportType) {
+        alert('Please select a report type first');
+        return;
+    }
+    
+    // Show progress
+    document.getElementById('reportConfig').style.display = 'none';
+    document.getElementById('generationProgress').style.display = 'block';
+    
+    // Collect configuration
+    const config = {
+        type: selectedReportType,
+        title: document.getElementById('reportTitle').value || `${selectedReportType.charAt(0).toUpperCase() + selectedReportType.slice(1)} Performance Report`,
+        institution: document.getElementById('institutionName').value,
+        period: document.getElementById('analysisPeriod').value,
+        sections: {
+            executive_summary: document.getElementById('includeExecutiveSummary').checked,
+            performance_metrics: document.getElementById('includePerformanceMetrics').checked,
+            recommendations: document.getElementById('includeRecommendations').checked,
+            benchmarking: document.getElementById('includeBenchmarking').checked,
+            visualizations: document.getElementById('includeVisualizations').checked
+        }
+    };
+    
+    // Simulate progress steps
+    const steps = [
+        'Analyzing institutional data...',
+        'Processing performance metrics...',
+        'Generating AI insights...',
+        'Creating visualizations...',
+        'Compiling final report...'
+    ];
+    
+    let currentStep = 0;
+    const stepInterval = setInterval(() => {
+        if (currentStep < steps.length) {
+            updateProgressStep(steps[currentStep]);
+            currentStep++;
+        }
+    }, 2000);
+    
+    try {
+        // Call API to generate report
+        const response = await fetch('/api/generate-report', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(config)
+        });
+        
+        const result = await response.json();
+        
+        clearInterval(stepInterval);
+        
+        if (result.success) {
+            generatedReport = result.report;
+            showReportPreview(result.report);
+        } else {
+            showError('Failed to generate report: ' + result.error);
+        }
+    } catch (error) {
+        clearInterval(stepInterval);
+        showError('Network error while generating report');
+    }
+}
+
+function updateProgressStep(stepText) {
+    document.getElementById('progressSteps').innerHTML = `
+        <div class="progress-step">
+            <i class="bi bi-gear-fill"></i>
+            <span>${stepText}</span>
+        </div>
+    `;
+}
+
+function showReportPreview(report) {
+    document.getElementById('generationProgress').style.display = 'none';
+    document.getElementById('reportPreview').style.display = 'block';
+    
+    let reportHTML = `
+        <div class="report-header-section">
+            <h2 class="report-section-title">${report.title}</h2>
+            <p class="text-muted">Generated on ${new Date().toLocaleDateString()}</p>
+        </div>
+    `;
+    
+    if (report.executive_summary) {
+        reportHTML += `
+            <div class="mb-4">
+                <h4 class="report-section-title">Executive Summary</h4>
+                <p>${report.executive_summary}</p>
+            </div>
+        `;
+    }
+    
+    if (report.performance_metrics) {
+        reportHTML += `
+            <div class="mb-4">
+                <h4 class="report-section-title">Performance Metrics</h4>
+                <div class="row">
+        `;
+        
+        Object.keys(report.performance_metrics).forEach(metric => {
+            reportHTML += `
+                <div class="col-md-6 mb-3">
+                    <div class="metric-highlight">
+                        ${metric.replace(/_/g, ' ')}: ${report.performance_metrics[metric]}
+                    </div>
+                </div>
+            `;
+        });
+        
+        reportHTML += `</div></div>`;
+    }
+    
+    if (report.ai_insights) {
+        reportHTML += `
+            <div class="mb-4">
+                <h4 class="report-section-title">AI-Generated Insights</h4>
+                <p>${report.ai_insights}</p>
+            </div>
+        `;
+    }
+    
+    if (report.recommendations) {
+        reportHTML += `
+            <div class="mb-4">
+                <h4 class="report-section-title">Recommendations</h4>
+                <ul>
+        `;
+        
+        report.recommendations.forEach(rec => {
+            reportHTML += `<li>${rec}</li>`;
+        });
+        
+        reportHTML += `</ul></div>`;
+    }
+    
+    document.getElementById('reportContent').innerHTML = reportHTML;
+}
+
+function downloadPDF() {
+    if (!generatedReport) return;
+    
+    // Create PDF download
+    window.print(); // Simple PDF generation via print
+}
+
+function downloadWord() {
+    if (!generatedReport) return;
+    
+    const content = document.getElementById('reportContent').innerHTML;
+    const blob = new Blob([content], {type: 'application/msword'});
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${generatedReport.title.replace(/\s+/g, '_')}.doc`;
+    link.click();
+    
+    URL.revokeObjectURL(url);
+}
+
+function downloadExcel() {
+    if (!generatedReport || !generatedReport.performance_metrics) return;
+    
+    // Convert metrics to CSV format
+    let csvContent = "Metric,Value\n";
+    Object.keys(generatedReport.performance_metrics).forEach(metric => {
+        csvContent += `"${metric}","${generatedReport.performance_metrics[metric]}"\n`;
+    });
+    
+    const blob = new Blob([csvContent], {type: 'text/csv'});
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `${generatedReport.title.replace(/\s+/g, '_')}_metrics.csv`;
+    link.click();
+    
+    URL.revokeObjectURL(url);
+}
+
+function shareReport() {
+    if (navigator.share) {
+        navigator.share({
+            title: generatedReport.title,
+            text: 'Check out this institutional performance report',
+            url: window.location.href
+        });
+    } else {
+        // Fallback: copy link to clipboard
+        navigator.clipboard.writeText(window.location.href);
+        alert('Report link copied to clipboard!');
+    }
+}
+
+function emailReport() {
+    const subject = encodeURIComponent(generatedReport.title);
+    const body = encodeURIComponent(`Please find the institutional performance report: ${window.location.href}`);
+    window.location.href = `mailto:?subject=${subject}&body=${body}`;
+}
+
+function showError(message) {
+    document.getElementById('generationProgress').style.display = 'none';
+    document.getElementById('reportConfig').style.display = 'block';
+    alert(message);
+}
+</script>
+{% endblock %}

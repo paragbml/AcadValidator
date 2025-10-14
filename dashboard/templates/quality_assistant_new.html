@@ -1,0 +1,1024 @@
+{% extends "base.html" %}
+
+{% block title %}AI Quality Assistant - UGC AICTE Portal{% endblock %}
+
+{% block custom_css %}
+<style>
+    :root {
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        --card-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        --card-shadow-hover: 0 15px 35px rgba(0,0,0,0.12);
+    }
+
+    .ai-header {
+        background: var(--primary-gradient);
+        border-radius: 20px;
+        padding: 40px;
+        margin-bottom: 30px;
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .ai-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -20%;
+        width: 200px;
+        height: 200px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+        animation: float 6s ease-in-out infinite;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: var(--card-shadow);
+        margin-bottom: 25px;
+        overflow: hidden;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        border: 1px solid rgba(0,0,0,0.05);
+        height: 100%;
+        cursor: pointer;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-8px) scale(1.02);
+        box-shadow: var(--card-shadow-hover);
+    }
+
+    .feature-header {
+        padding: 25px;
+        background: var(--secondary-gradient);
+        color: white;
+        text-align: center;
+        position: relative;
+    }
+
+    .feature-icon {
+        width: 70px;
+        height: 70px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 15px;
+        font-size: 30px;
+        backdrop-filter: blur(10px);
+    }
+
+    .status-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .status-active { background: #28a745; }
+    .status-beta { background: #ffc107; color: #000; }
+
+    .analysis-section {
+        background: white;
+        border-radius: 20px;
+        box-shadow: var(--card-shadow);
+        margin: 30px 0;
+        overflow: hidden;
+    }
+
+    .section-header {
+        padding: 25px;
+        background: var(--success-gradient);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .quality-metrics {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        padding: 25px;
+    }
+
+    .metric-card {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 15px;
+        padding: 20px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: var(--primary-gradient);
+    }
+
+    .metric-value {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+        background: var(--primary-gradient);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .metric-label {
+        color: #6c757d;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .recommendations-panel {
+        background: var(--success-gradient);
+        color: white;
+        border-radius: 20px;
+        padding: 30px;
+        margin: 25px 0;
+    }
+
+    .recommendation-item {
+        background: rgba(255,255,255,0.15);
+        border-radius: 12px;
+        padding: 20px;
+        margin: 15px 0;
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255,255,255,0.2);
+        transition: all 0.3s ease;
+    }
+
+    .recommendation-item:hover {
+        background: rgba(255,255,255,0.25);
+        transform: translateX(5px);
+    }
+
+    .priority-high { border-left: 5px solid #dc3545; }
+    .priority-medium { border-left: 5px solid #ffc107; }
+    .priority-low { border-left: 5px solid #28a745; }
+
+    .btn-analyze {
+        background: var(--primary-gradient);
+        border: none;
+        border-radius: 30px;
+        padding: 15px 40px;
+        color: white;
+        font-weight: 600;
+        font-size: 16px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-analyze:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+
+    .btn-analyze::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+        transition: left 0.5s;
+    }
+
+    .btn-analyze:hover::before {
+        left: 100%;
+    }
+
+    .chart-container {
+        background: white;
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: var(--card-shadow);
+        margin: 15px 0;
+    }
+
+    .loading-spinner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 60px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: var(--card-shadow);
+    }
+
+    .spinner-ai {
+        width: 60px;
+        height: 60px;
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #667eea;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    .insight-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin: 15px 0;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .insight-card::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        right: -50%;
+        width: 100px;
+        height: 100px;
+        background: rgba(255,255,255,0.1);
+        border-radius: 50%;
+        animation: pulse 4s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 0.7; }
+        50% { transform: scale(1.2); opacity: 0.3; }
+    }
+
+    .anomaly-item {
+        background: #fff3cd;
+        border: 1px solid #ffeaa7;
+        border-radius: 10px;
+        padding: 15px;
+        margin: 10px 0;
+        border-left: 4px solid #f39c12;
+    }
+
+    .trust-indicator {
+        display: inline-flex;
+        align-items: center;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .trust-high { background: #d4edda; color: #155724; }
+    .trust-medium { background: #fff3cd; color: #856404; }
+    .trust-low { background: #f8d7da; color: #721c24; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4">
+    <!-- AI Assistant Header -->
+    <div class="ai-header">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="display-4 fw-bold mb-3">
+                    <i class="bi bi-robot me-3"></i>AI Quality Assistant
+                </h1>
+                <p class="lead mb-0">
+                    Intelligent data quality analysis powered by advanced machine learning algorithms
+                </p>
+                <small class="opacity-75">
+                    <i class="bi bi-lightning-fill me-1"></i>
+                    Real-time analysis • Predictive insights • Automated recommendations
+                </small>
+            </div>
+            <div class="col-lg-4 text-end">
+                <button class="btn btn-analyze" onclick="startComprehensiveAnalysis()">
+                    <i class="bi bi-play-fill me-2"></i>Start Analysis
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Features Grid -->
+    <div class="row">
+        <!-- Data Quality Overview -->
+        <div class="col-xl-3 col-lg-6 col-md-6">
+            <div class="feature-card" onclick="showDataQualityOverview()">
+                <div class="feature-header">
+                    <div class="status-badge status-active">Active</div>
+                    <div class="feature-icon">
+                        <i class="bi bi-graph-up"></i>
+                    </div>
+                    <h5 class="mb-2">Data Quality Overview</h5>
+                    <p class="mb-0">Comprehensive assessment</p>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted mb-4">Real-time analysis of data completeness, accuracy, and consistency across all institutional records.</p>
+                    <div class="d-flex justify-content-between text-center">
+                        <div>
+                            <div class="fw-bold text-success">94.2%</div>
+                            <small class="text-muted">Completeness</small>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-info">87.8%</div>
+                            <small class="text-muted">Accuracy</small>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-warning">91.5%</div>
+                            <small class="text-muted">Consistency</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Anomaly Detection -->
+        <div class="col-xl-3 col-lg-6 col-md-6">
+            <div class="feature-card" onclick="showAnomalyDetection()">
+                <div class="feature-header">
+                    <div class="status-badge status-active">Active</div>
+                    <div class="feature-icon">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                    <h5 class="mb-2">Anomaly Detection</h5>
+                    <p class="mb-0">AI-powered outlier identification</p>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted mb-4">Advanced machine learning algorithms detect statistical outliers and impossible values in institutional data.</p>
+                    <div class="d-flex justify-content-between text-center">
+                        <div>
+                            <div class="fw-bold text-danger">23</div>
+                            <small class="text-muted">Outliers</small>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-warning">7</div>
+                            <small class="text-muted">Impossible</small>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-info">156</div>
+                            <small class="text-muted">Reviewed</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trust Index -->
+        <div class="col-xl-3 col-lg-6 col-md-6">
+            <div class="feature-card" onclick="showTrustIndex()">
+                <div class="feature-header">
+                    <div class="status-badge status-active">Active</div>
+                    <div class="feature-icon">
+                        <i class="bi bi-shield-check"></i>
+                    </div>
+                    <h5 class="mb-2">Trust Index</h5>
+                    <p class="mb-0">Credibility scoring</p>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted mb-4">Comprehensive trust scoring based on transparency, accountability, and data reliability metrics.</p>
+                    <div class="text-center">
+                        <div class="metric-value" style="font-size: 2rem; color: #28a745;">84.7</div>
+                        <div class="trust-indicator trust-high">
+                            <i class="bi bi-check-circle me-1"></i>High Trust
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- AI Recommendations -->
+        <div class="col-xl-3 col-lg-6 col-md-6">
+            <div class="feature-card" onclick="showAIRecommendations()">
+                <div class="feature-header">
+                    <div class="status-badge status-beta">Beta</div>
+                    <div class="feature-icon">
+                        <i class="bi bi-lightbulb"></i>
+                    </div>
+                    <h5 class="mb-2">AI Recommendations</h5>
+                    <p class="mb-0">Intelligent suggestions</p>
+                </div>
+                <div class="card-body p-4">
+                    <p class="text-muted mb-4">Machine learning-powered recommendations for improving institutional performance and compliance.</p>
+                    <div class="d-flex justify-content-between text-center">
+                        <div>
+                            <div class="fw-bold text-success">12</div>
+                            <small class="text-muted">Active</small>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-info">8</div>
+                            <small class="text-muted">Pending</small>
+                        </div>
+                        <div>
+                            <div class="fw-bold text-warning">3</div>
+                            <small class="text-muted">Critical</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div class="loading-spinner" id="analysisLoading" style="display: none;">
+        <div class="spinner-ai"></div>
+        <h5 class="mt-3 text-primary">Analyzing Data Quality...</h5>
+        <p class="text-muted">Running comprehensive AI analysis on institutional data</p>
+    </div>
+
+    <!-- Main Analysis Dashboard -->
+    <div class="analysis-section" id="analysisDashboard" style="display: none;">
+        <div class="section-header">
+            <div>
+                <h4 class="mb-0">
+                    <i class="bi bi-cpu me-2"></i>AI Analysis Dashboard
+                </h4>
+                <small>Real-time quality assessment results</small>
+            </div>
+            <div>
+                <span class="badge bg-light text-dark">Last Updated: <span id="lastUpdated">2024-10-12 14:30</span></span>
+            </div>
+        </div>
+
+        <!-- Quality Metrics -->
+        <div class="quality-metrics" id="qualityMetrics">
+            <!-- Metrics will be populated dynamically -->
+        </div>
+
+        <!-- Charts Section -->
+        <div class="row p-4">
+            <div class="col-lg-6">
+                <div class="chart-container">
+                    <h6 class="mb-3">
+                        <i class="bi bi-bar-chart me-2"></i>Quality Score Distribution
+                    </h6>
+                    <canvas id="qualityChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="chart-container">
+                    <h6 class="mb-3">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Anomaly Detection
+                    </h6>
+                    <canvas id="anomalyChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI Recommendations Panel -->
+    <div class="recommendations-panel" id="recommendationsPanel" style="display: none;">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h4 class="mb-1">
+                    <i class="bi bi-lightbulb me-2"></i>AI Recommendations
+                </h4>
+                <p class="mb-0 opacity-75">Intelligent suggestions for data quality improvement</p>
+            </div>
+            <div class="badge bg-light text-dark">23 Active Recommendations</div>
+        </div>
+        <div id="recommendationsList">
+            <!-- Recommendations will be populated dynamically -->
+        </div>
+    </div>
+
+    <!-- Detailed Analysis Sections -->
+    <div class="row" id="detailedSections" style="display: none;">
+        <div class="col-lg-6">
+            <div class="analysis-section">
+                <div class="section-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-exclamation-triangle me-2"></i>Detected Anomalies
+                    </h5>
+                </div>
+                <div class="p-4" id="anomaliesList">
+                    <!-- Anomalies will be populated dynamically -->
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="analysis-section">
+                <div class="section-header">
+                    <h5 class="mb-0">
+                        <i class="bi bi-shield-check me-2"></i>Trust Index Analysis
+                    </h5>
+                </div>
+                <div class="p-4" id="trustAnalysis">
+                    <!-- Trust analysis will be populated dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('AI Quality Assistant loaded');
+    loadInitialMetrics();
+});
+
+// Sample data for demonstration
+const sampleQualityData = {
+    overall_score: 87.5,
+    completeness: 94.2,
+    accuracy: 87.8,
+    consistency: 91.5,
+    timeliness: 83.4,
+    anomalies_detected: 23,
+    trust_score: 84.7,
+    last_updated: new Date().toLocaleDateString()
+};
+
+const sampleAnomalies = [
+    {
+        type: 'Statistical Outlier',
+        description: 'Placement rate of 150% detected for ABC College',
+        severity: 'high',
+        field: 'placement_rate',
+        institution: 'ABC College of Engineering'
+    },
+    {
+        type: 'Missing Data',
+        description: 'Faculty count missing for 12 institutions',
+        severity: 'medium',
+        field: 'faculty_count',
+        institution: 'Multiple'
+    },
+    {
+        type: 'Impossible Value',
+        description: 'Negative student enrollment found',
+        severity: 'high',
+        field: 'student_count',
+        institution: 'XYZ University'
+    }
+];
+
+const sampleRecommendations = [
+    {
+        priority: 'high',
+        title: 'Verify Placement Rate Data',
+        description: 'Several institutions report placement rates above 100%. Recommend data validation and verification process.',
+        impact: 'Data Accuracy',
+        estimated_effort: '2-3 days'
+    },
+    {
+        priority: 'medium',
+        title: 'Complete Missing Faculty Information',
+        description: 'Faculty count data missing for 12 institutions. Contact institutions to provide updated information.',
+        impact: 'Data Completeness',
+        estimated_effort: '1 week'
+    },
+    {
+        priority: 'low',
+        title: 'Standardize Date Formats',
+        description: 'Multiple date formats detected across submissions. Implement standard date format validation.',
+        impact: 'Data Consistency',
+        estimated_effort: '1 day'
+    }
+];
+
+function loadInitialMetrics() {
+    // Simulate loading some basic metrics on page load
+    const metricsContainer = document.getElementById('qualityMetrics');
+    if (metricsContainer) {
+        metricsContainer.innerHTML = `
+            <div class="metric-card">
+                <div class="metric-value">${sampleQualityData.overall_score}%</div>
+                <div class="metric-label">Overall Quality Score</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">${sampleQualityData.completeness}%</div>
+                <div class="metric-label">Data Completeness</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">${sampleQualityData.accuracy}%</div>
+                <div class="metric-label">Data Accuracy</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value">${sampleQualityData.consistency}%</div>
+                <div class="metric-label">Data Consistency</div>
+            </div>
+        `;
+    }
+}
+
+function startComprehensiveAnalysis() {
+    console.log('Starting comprehensive AI analysis...');
+    
+    // Show loading spinner
+    const loading = document.getElementById('analysisLoading');
+    const dashboard = document.getElementById('analysisDashboard');
+    const recommendations = document.getElementById('recommendationsPanel');
+    const detailed = document.getElementById('detailedSections');
+    
+    // Hide all sections initially
+    dashboard.style.display = 'none';
+    recommendations.style.display = 'none';
+    detailed.style.display = 'none';
+    
+    // Show loading
+    loading.style.display = 'block';
+    
+    // Simulate analysis process
+    setTimeout(() => {
+        loading.style.display = 'none';
+        dashboard.style.display = 'block';
+        
+        // Update last updated time
+        document.getElementById('lastUpdated').textContent = new Date().toLocaleString();
+        
+        // Create charts
+        createQualityChart();
+        createAnomalyChart();
+        
+        setTimeout(() => {
+            recommendations.style.display = 'block';
+            populateRecommendations();
+            
+            setTimeout(() => {
+                detailed.style.display = 'block';
+                populateAnomalies();
+                populateTrustAnalysis();
+            }, 500);
+        }, 1000);
+    }, 2000);
+}
+
+function showDataQualityOverview() {
+    console.log('Showing data quality overview...');
+    
+    const insight = `
+        <div class="insight-card">
+            <h5><i class="bi bi-graph-up me-2"></i>Data Quality Insights</h5>
+            <div class="row mt-3">
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div class="h3">${sampleQualityData.completeness}%</div>
+                        <small>Completeness</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div class="h3">${sampleQualityData.accuracy}%</div>
+                        <small>Accuracy</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div class="h3">${sampleQualityData.consistency}%</div>
+                        <small>Consistency</small>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="text-center">
+                        <div class="h3">${sampleQualityData.timeliness}%</div>
+                        <small>Timeliness</small>
+                    </div>
+                </div>
+            </div>
+            <p class="mt-3 mb-0">
+                <strong>Analysis:</strong> Overall data quality is good with ${sampleQualityData.overall_score}% score. 
+                Primary areas for improvement are data accuracy and timeliness.
+            </p>
+        </div>
+    `;
+    
+    // Insert insight card after the feature grid
+    const featureGrid = document.querySelector('.row').nextElementSibling;
+    if (!document.getElementById('qualityInsight')) {
+        const insightDiv = document.createElement('div');
+        insightDiv.id = 'qualityInsight';
+        insightDiv.innerHTML = insight;
+        featureGrid.parentNode.insertBefore(insightDiv, featureGrid);
+    }
+}
+
+function showAnomalyDetection() {
+    console.log('Showing anomaly detection...');
+    
+    const anomalyInsight = `
+        <div class="insight-card">
+            <h5><i class="bi bi-exclamation-triangle me-2"></i>Anomaly Detection Results</h5>
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <div class="h3 text-danger">${sampleQualityData.anomalies_detected}</div>
+                        <small>Anomalies Detected</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <div class="h3 text-warning">7</div>
+                        <small>High Priority</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <div class="h3 text-info">156</div>
+                        <small>Records Reviewed</small>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-3">
+                <strong>Recent Anomalies:</strong>
+                <ul class="mt-2 mb-0">
+                    <li>Placement rate >100% in 3 institutions</li>
+                    <li>Negative student count in 2 records</li>
+                    <li>Faculty ratio outliers in 5 colleges</li>
+                </ul>
+            </div>
+        </div>
+    `;
+    
+    showInsightCard('anomalyInsight', anomalyInsight);
+}
+
+function showTrustIndex() {
+    console.log('Showing trust index...');
+    
+    const trustInsight = `
+        <div class="insight-card">
+            <h5><i class="bi bi-shield-check me-2"></i>Institution Trust Index</h5>
+            <div class="row mt-3 align-items-center">
+                <div class="col-md-6">
+                    <div class="text-center">
+                        <div class="h1">${sampleQualityData.trust_score}</div>
+                        <div class="trust-indicator trust-high">
+                            <i class="bi bi-check-circle me-1"></i>High Trust Score
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <strong>Trust Factors:</strong>
+                    <ul class="mt-2 mb-0">
+                        <li>Data transparency: 89%</li>
+                        <li>Reporting consistency: 92%</li>
+                        <li>Verification success: 81%</li>
+                        <li>Compliance rate: 95%</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    showInsightCard('trustInsight', trustInsight);
+}
+
+function showAIRecommendations() {
+    console.log('Showing AI recommendations...');
+    
+    const recommendationsInsight = `
+        <div class="insight-card">
+            <h5><i class="bi bi-lightbulb me-2"></i>AI-Powered Recommendations</h5>
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <div class="h3 text-success">12</div>
+                        <small>Active Recommendations</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <div class="h3 text-warning">8</div>
+                        <small>Pending Review</small>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="text-center">
+                        <div class="h3 text-danger">3</div>
+                        <small>Critical Priority</small>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-3">
+                <strong>Top Recommendations:</strong>
+                <ul class="mt-2 mb-0">
+                    <li>Implement automated data validation rules</li>
+                    <li>Establish regular data quality monitoring</li>
+                    <li>Create institutional feedback system</li>
+                </ul>
+            </div>
+        </div>
+    `;
+    
+    showInsightCard('recommendationsInsight', recommendationsInsight);
+}
+
+function showInsightCard(id, content) {
+    // Remove existing insight cards
+    const existing = document.getElementById(id);
+    if (existing) {
+        existing.remove();
+    }
+    
+    // Insert new insight card
+    const insightDiv = document.createElement('div');
+    insightDiv.id = id;
+    insightDiv.innerHTML = content;
+    
+    const container = document.querySelector('.container-fluid');
+    const header = container.querySelector('.ai-header');
+    header.parentNode.insertBefore(insightDiv, header.nextSibling);
+}
+
+function createQualityChart() {
+    const ctx = document.getElementById('qualityChart');
+    if (!ctx) return;
+    
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Excellent (90-100%)', 'Good (75-89%)', 'Fair (60-74%)', 'Poor (<60%)'],
+            datasets: [{
+                data: [145, 267, 89, 23],
+                backgroundColor: ['#28a745', '#17a2b8', '#ffc107', '#dc3545'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+}
+
+function createAnomalyChart() {
+    const ctx = document.getElementById('anomalyChart');
+    if (!ctx) return;
+    
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Statistical Outliers', 'Missing Data', 'Impossible Values', 'Format Issues'],
+            datasets: [{
+                label: 'Anomalies',
+                data: [12, 8, 5, 15],
+                backgroundColor: ['#dc3545', '#ffc107', '#fd7e14', '#6f42c1'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                }
+            }
+        }
+    });
+}
+
+function populateRecommendations() {
+    const container = document.getElementById('recommendationsList');
+    if (!container) return;
+    
+    container.innerHTML = sampleRecommendations.map(rec => `
+        <div class="recommendation-item priority-${rec.priority}">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h6 class="mb-2">
+                        <i class="bi bi-${getPriorityIcon(rec.priority)} me-2"></i>
+                        ${rec.title}
+                    </h6>
+                    <p class="mb-2">${rec.description}</p>
+                    <small><strong>Impact:</strong> ${rec.impact} | <strong>Effort:</strong> ${rec.estimated_effort}</small>
+                </div>
+                <span class="badge bg-light text-dark">${rec.priority.toUpperCase()}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function populateAnomalies() {
+    const container = document.getElementById('anomaliesList');
+    if (!container) return;
+    
+    container.innerHTML = sampleAnomalies.map(anomaly => `
+        <div class="anomaly-item">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h6 class="mb-1">${anomaly.type}</h6>
+                    <p class="mb-2">${anomaly.description}</p>
+                    <small class="text-muted">
+                        <strong>Field:</strong> ${anomaly.field} | 
+                        <strong>Institution:</strong> ${anomaly.institution}
+                    </small>
+                </div>
+                <span class="badge bg-${getSeverityColor(anomaly.severity)}">${anomaly.severity}</span>
+            </div>
+        </div>
+    `).join('');
+}
+
+function populateTrustAnalysis() {
+    const container = document.getElementById('trustAnalysis');
+    if (!container) return;
+    
+    container.innerHTML = `
+        <div class="text-center mb-4">
+            <div class="h2 text-success">${sampleQualityData.trust_score}/100</div>
+            <div class="trust-indicator trust-high">
+                <i class="bi bi-check-circle me-1"></i>High Trust Level
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>Transparency</span>
+                        <span>89%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" style="width: 89%"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>Consistency</span>
+                        <span>92%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-info" style="width: 92%"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>Verification</span>
+                        <span>81%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-warning" style="width: 81%"></div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <div class="d-flex justify-content-between">
+                        <span>Compliance</span>
+                        <span>95%</span>
+                    </div>
+                    <div class="progress">
+                        <div class="progress-bar bg-primary" style="width: 95%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function getPriorityIcon(priority) {
+    const icons = {
+        'high': 'exclamation-triangle',
+        'medium': 'info-circle',
+        'low': 'check-circle'
+    };
+    return icons[priority] || 'info-circle';
+}
+
+function getSeverityColor(severity) {
+    const colors = {
+        'high': 'danger',
+        'medium': 'warning',
+        'low': 'success'
+    };
+    return colors[severity] || 'secondary';
+}
+</script>
+{% endblock %}

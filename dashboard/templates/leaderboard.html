@@ -1,0 +1,458 @@
+{% extends "base.html" %}
+
+{% block title %}{{ page_title }} - UGC AICTE Portal{% endblock %}
+
+{% block custom_css %}
+<style>
+    .leaderboard-dashboard {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        padding: 20px 0;
+    }
+    
+    .leaderboard-header {
+        background: rgba(255,255,255,0.95);
+        border-radius: 15px;
+        padding: 30px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        backdrop-filter: blur(10px);
+    }
+    
+    .category-tabs {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    
+    .leaderboard-container {
+        background: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 20px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    
+    .category-btn {
+        border: 2px solid #e9ecef;
+        background: white;
+        color: #6c757d;
+        padding: 12px 24px;
+        border-radius: 25px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        margin-right: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .category-btn:hover {
+        border-color: #667eea;
+        color: #667eea;
+        transform: translateY(-2px);
+    }
+    
+    .category-btn.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: #667eea;
+        color: white;
+    }
+    
+    .leaderboard-item {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 15px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .leaderboard-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+    
+    .rank-badge {
+        position: absolute;
+        top: -5px;
+        left: -5px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+    }
+    
+    .rank-badge.top3 {
+        background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
+        color: #333;
+        width: 50px;
+        height: 50px;
+    }
+    
+    .institution-info {
+        margin-left: 50px;
+    }
+    
+    .institution-name {
+        font-weight: 600;
+        color: #333;
+        font-size: 1.1rem;
+        margin-bottom: 5px;
+    }
+    
+    .institution-details {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 10px;
+    }
+    
+    .performance-metrics {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+    
+    .metric-chip {
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+        padding: 4px 12px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    
+    .filters-section {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 20px;
+    }
+    
+    .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{{ url_for('index') }}">Dashboard</a></li>
+<li class="breadcrumb-item active" aria-current="page">Institution Leaderboard</li>
+{% endblock %}
+
+{% block content %}
+<div class="leaderboard-dashboard">
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="leaderboard-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-3">
+                        <i class="bi bi-trophy text-warning"></i>
+                        Institution Leaderboard
+                    </h1>
+                    <p class="lead mb-0">Comprehensive ranking of institutions across different performance categories</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="ai-badge">
+                        <i class="bi bi-robot"></i>
+                        <span>AI-Ranked</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Selection -->
+        <div class="category-tabs">
+            <h5 class="mb-3">Ranking Categories</h5>
+            <div class="btn-group-custom">
+                <button class="category-btn active" data-category="overall">
+                    <i class="bi bi-star"></i> Overall Performance
+                </button>
+                <button class="category-btn" data-category="nirf">
+                    <i class="bi bi-award"></i> NIRF Rankings
+                </button>
+                <button class="category-btn" data-category="placement">
+                    <i class="bi bi-briefcase"></i> Placement Rate
+                </button>
+                <button class="category-btn" data-category="research">
+                    <i class="bi bi-book"></i> Research Excellence
+                </button>
+                <button class="category-btn" data-category="infrastructure">
+                    <i class="bi bi-building"></i> Infrastructure
+                </button>
+                <button class="category-btn" data-category="student">
+                    <i class="bi bi-people"></i> Student Satisfaction
+                </button>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="leaderboard-container">
+            <div class="filters-section">
+                <div class="filter-group">
+                    <label class="form-label mb-0">State:</label>
+                    <select class="form-select form-select-sm" id="stateFilter">
+                        <option value="">All States</option>
+                        <option value="Maharashtra">Maharashtra</option>
+                        <option value="Karnataka">Karnataka</option>
+                        <option value="Tamil Nadu">Tamil Nadu</option>
+                        <option value="Delhi">Delhi</option>
+                        <option value="Gujarat">Gujarat</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="form-label mb-0">Type:</label>
+                    <select class="form-select form-select-sm" id="typeFilter">
+                        <option value="">All Types</option>
+                        <option value="Government">Government</option>
+                        <option value="Private">Private</option>
+                        <option value="Autonomous">Autonomous</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="form-label mb-0">Category:</label>
+                    <select class="form-select form-select-sm" id="categoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Management">Management</option>
+                        <option value="Pharmacy">Pharmacy</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="leaderboard-container">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h5 class="mb-0">Rankings</h5>
+                <button class="btn btn-outline-primary btn-sm" onclick="exportLeaderboard()">
+                    <i class="bi bi-download"></i> Export Rankings
+                </button>
+            </div>
+            
+            <div id="leaderboardList">
+                <!-- Leaderboard items will be populated by JavaScript -->
+            </div>
+            
+            <div class="text-center mt-4">
+                <button class="btn btn-primary" onclick="loadMoreInstitutions()">
+                    <i class="bi bi-arrow-down"></i> Load More
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block custom_js %}
+<script>
+let currentCategory = 'overall';
+let currentPage = 1;
+let leaderboardData = [];
+
+// Sample data - replace with actual API calls
+const sampleInstitutions = [
+    {
+        name: "Indian Institute of Technology, Delhi",
+        location: "Delhi",
+        type: "Government",
+        category: "Engineering",
+        nirfRank: 2,
+        placementRate: 94.5,
+        researchScore: 9.2,
+        infrastructureScore: 9.0,
+        studentSatisfaction: 8.8,
+        overallScore: 92.1
+    },
+    {
+        name: "Indian Institute of Science, Bangalore",
+        location: "Karnataka",
+        type: "Government",
+        category: "Research",
+        nirfRank: 1,
+        placementRate: 89.2,
+        researchScore: 9.8,
+        infrastructureScore: 8.9,
+        studentSatisfaction: 9.1,
+        overallScore: 94.3
+    },
+    {
+        name: "IIT Bombay",
+        location: "Maharashtra",
+        type: "Government",
+        category: "Engineering",
+        nirfRank: 3,
+        placementRate: 92.1,
+        researchScore: 9.0,
+        infrastructureScore: 8.8,
+        studentSatisfaction: 8.9,
+        overallScore: 91.2
+    }
+    // Add more sample data...
+];
+
+document.addEventListener('DOMContentLoaded', function() {
+    setupCategoryButtons();
+    setupFilters();
+    loadLeaderboard();
+});
+
+function setupCategoryButtons() {
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            currentCategory = this.dataset.category;
+            loadLeaderboard();
+        });
+    });
+}
+
+function setupFilters() {
+    ['stateFilter', 'typeFilter', 'categoryFilter'].forEach(filterId => {
+        document.getElementById(filterId).addEventListener('change', loadLeaderboard);
+    });
+}
+
+function loadLeaderboard() {
+    // Sort institutions based on current category
+    let sortedData = [...sampleInstitutions];
+    
+    switch (currentCategory) {
+        case 'overall':
+            sortedData.sort((a, b) => b.overallScore - a.overallScore);
+            break;
+        case 'nirf':
+            sortedData.sort((a, b) => a.nirfRank - b.nirfRank);
+            break;
+        case 'placement':
+            sortedData.sort((a, b) => b.placementRate - a.placementRate);
+            break;
+        case 'research':
+            sortedData.sort((a, b) => b.researchScore - a.researchScore);
+            break;
+        case 'infrastructure':
+            sortedData.sort((a, b) => b.infrastructureScore - a.infrastructureScore);
+            break;
+        case 'student':
+            sortedData.sort((a, b) => b.studentSatisfaction - a.studentSatisfaction);
+            break;
+    }
+    
+    // Apply filters
+    const stateFilter = document.getElementById('stateFilter').value;
+    const typeFilter = document.getElementById('typeFilter').value;
+    const categoryFilter = document.getElementById('categoryFilter').value;
+    
+    if (stateFilter) sortedData = sortedData.filter(inst => inst.location.includes(stateFilter));
+    if (typeFilter) sortedData = sortedData.filter(inst => inst.type === typeFilter);
+    if (categoryFilter) sortedData = sortedData.filter(inst => inst.category === categoryFilter);
+    
+    renderLeaderboard(sortedData);
+}
+
+function renderLeaderboard(data) {
+    const container = document.getElementById('leaderboardList');
+    let html = '';
+    
+    data.forEach((institution, index) => {
+        const rank = index + 1;
+        const isTop3 = rank <= 3;
+        
+        let mainMetric;
+        switch (currentCategory) {
+            case 'overall':
+                mainMetric = `${institution.overallScore}% Overall Score`;
+                break;
+            case 'nirf':
+                mainMetric = `NIRF Rank #${institution.nirfRank}`;
+                break;
+            case 'placement':
+                mainMetric = `${institution.placementRate}% Placement Rate`;
+                break;
+            case 'research':
+                mainMetric = `${institution.researchScore}/10 Research Score`;
+                break;
+            case 'infrastructure':
+                mainMetric = `${institution.infrastructureScore}/10 Infrastructure`;
+                break;
+            case 'student':
+                mainMetric = `${institution.studentSatisfaction}/10 Student Rating`;
+                break;
+        }
+        
+        html += `
+            <div class="leaderboard-item">
+                <div class="rank-badge ${isTop3 ? 'top3' : ''}">${rank}</div>
+                <div class="institution-info">
+                    <div class="institution-name">${institution.name}</div>
+                    <div class="institution-details">
+                        ${institution.location} • ${institution.type} • ${institution.category}
+                    </div>
+                    <div class="performance-metrics">
+                        <div class="metric-chip">${mainMetric}</div>
+                        <div class="metric-chip">NIRF: #${institution.nirfRank}</div>
+                        <div class="metric-chip">Placement: ${institution.placementRate}%</div>
+                        <div class="metric-chip">Research: ${institution.researchScore}/10</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    container.innerHTML = html;
+}
+
+function loadMoreInstitutions() {
+    // Implement pagination
+    currentPage++;
+    // Load more data and append to existing list
+}
+
+function exportLeaderboard() {
+    // Export current leaderboard data
+    const csvContent = generateCSV(leaderboardData);
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `leaderboard_${currentCategory}_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    
+    URL.revokeObjectURL(url);
+}
+
+function generateCSV(data) {
+    const headers = ['Rank', 'Institution', 'Location', 'Type', 'Category', 'NIRF Rank', 'Placement Rate', 'Overall Score'];
+    let csv = headers.join(',') + '\n';
+    
+    data.forEach((institution, index) => {
+        const row = [
+            index + 1,
+            `"${institution.name}"`,
+            institution.location,
+            institution.type,
+            institution.category,
+            institution.nirfRank,
+            institution.placementRate,
+            institution.overallScore
+        ];
+        csv += row.join(',') + '\n';
+    });
+    
+    return csv;
+}
+</script>
+{% endblock %}

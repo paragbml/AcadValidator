@@ -1,0 +1,312 @@
+{% extends "base.html" %}
+
+{% block title %}Trust Index - UGC-AICTE Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+.trust-dashboard {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    min-height: 100vh;
+    padding: 20px 0;
+}
+
+.trust-header {
+    background: rgba(255,255,255,0.95);
+    border-radius: 15px;
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+}
+
+.trust-card {
+    background: white;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.trust-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+.trust-score {
+    font-size: 4rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.trust-gauge {
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.trust-indicator {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 10px;
+}
+
+.trust-high { background: #28a745; }
+.trust-medium { background: #ffc107; }
+.trust-low { background: #dc3545; }
+
+.ai-badge {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+</style>
+{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{{ url_for('index') }}">Dashboard</a></li>
+<li class="breadcrumb-item active" aria-current="page">Trust Index</li>
+{% endblock %}
+
+{% block content %}
+<div class="trust-dashboard">
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="trust-header">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-3">
+                        <i class="bi bi-shield-check text-primary"></i>
+                        Institutional Trust Index
+                    </h1>
+                    <p class="lead mb-0">AI-powered trust assessment based on transparency, accountability, and performance metrics</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <div class="ai-badge">
+                        <i class="bi bi-graph-up"></i>
+                        <span>Trust Analytics</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Overall Trust Score -->
+            <div class="col-lg-4 mb-4">
+                <div class="trust-card text-center">
+                    <h4 class="text-dark mb-4">Overall Trust Score</h4>
+                    <div class="trust-score">85.2</div>
+                    <p class="text-muted mb-4">out of 100</p>
+                    <div class="trust-gauge">
+                        <canvas id="trustGauge" width="200" height="200"></canvas>
+                    </div>
+                    <div class="mt-3">
+                        <span class="badge bg-success fs-6">High Trust Level</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trust Components -->
+            <div class="col-lg-8 mb-4">
+                <div class="trust-card">
+                    <h4 class="text-dark mb-4">Trust Components</h4>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="component-item p-3 border rounded">
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="trust-indicator trust-high"></span>
+                                    <h6 class="mb-0">Academic Transparency</h6>
+                                </div>
+                                <div class="progress mb-2">
+                                    <div class="progress-bar bg-success" style="width: 92%"></div>
+                                </div>
+                                <small class="text-muted">92% - Excellent curriculum disclosure</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="component-item p-3 border rounded">
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="trust-indicator trust-high"></span>
+                                    <h6 class="mb-0">Financial Accountability</h6>
+                                </div>
+                                <div class="progress mb-2">
+                                    <div class="progress-bar bg-success" style="width: 88%"></div>
+                                </div>
+                                <small class="text-muted">88% - Strong financial reporting</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="component-item p-3 border rounded">
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="trust-indicator trust-medium"></span>
+                                    <h6 class="mb-0">Governance Quality</h6>
+                                </div>
+                                <div class="progress mb-2">
+                                    <div class="progress-bar bg-warning" style="width: 78%"></div>
+                                </div>
+                                <small class="text-muted">78% - Good governance practices</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="component-item p-3 border rounded">
+                                <div class="d-flex align-items-center mb-2">
+                                    <span class="trust-indicator trust-high"></span>
+                                    <h6 class="mb-0">Student Feedback</h6>
+                                </div>
+                                <div class="progress mb-2">
+                                    <div class="progress-bar bg-success" style="width: 85%"></div>
+                                </div>
+                                <small class="text-muted">85% - Positive student reviews</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trust Trends -->
+            <div class="col-lg-8 mb-4">
+                <div class="trust-card">
+                    <h4 class="text-dark mb-4">Trust Trends (Last 5 Years)</h4>
+                    <canvas id="trustTrendChart" width="600" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- Benchmark Comparison -->
+            <div class="col-lg-4 mb-4">
+                <div class="trust-card">
+                    <h4 class="text-dark mb-4">Benchmark Comparison</h4>
+                    <div class="benchmark-item mb-3 p-3 bg-light rounded">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">Your Institution</span>
+                            <span class="badge bg-primary">85.2</span>
+                        </div>
+                    </div>
+                    <div class="benchmark-item mb-3 p-3 bg-light rounded">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>State Average</span>
+                            <span class="badge bg-secondary">78.5</span>
+                        </div>
+                    </div>
+                    <div class="benchmark-item mb-3 p-3 bg-light rounded">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>National Average</span>
+                            <span class="badge bg-secondary">76.8</span>
+                        </div>
+                    </div>
+                    <div class="benchmark-item p-3 bg-light rounded">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Top 10% Average</span>
+                            <span class="badge bg-success">94.2</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trust Factors -->
+            <div class="col-12">
+                <div class="trust-card">
+                    <h4 class="text-dark mb-4">
+                        <i class="bi bi-list-check text-primary"></i>
+                        Key Trust Factors
+                    </h4>
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="factor-item p-3 border-start border-success border-4 bg-light h-100">
+                                <h6 class="text-success mb-2">Strengths</h6>
+                                <ul class="list-unstyled mb-0">
+                                    <li><i class="bi bi-check-circle text-success me-2"></i>Transparent admissions</li>
+                                    <li><i class="bi bi-check-circle text-success me-2"></i>Regular audits</li>
+                                    <li><i class="bi bi-check-circle text-success me-2"></i>Public data disclosure</li>
+                                    <li><i class="bi bi-check-circle text-success me-2"></i>Student grievance system</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="factor-item p-3 border-start border-warning border-4 bg-light h-100">
+                                <h6 class="text-warning mb-2">Areas for Improvement</h6>
+                                <ul class="list-unstyled mb-0">
+                                    <li><i class="bi bi-exclamation-circle text-warning me-2"></i>Board diversity</li>
+                                    <li><i class="bi bi-exclamation-circle text-warning me-2"></i>Stakeholder engagement</li>
+                                    <li><i class="bi bi-exclamation-circle text-warning me-2"></i>Digital transparency</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="factor-item p-3 border-start border-info border-4 bg-light h-100">
+                                <h6 class="text-info mb-2">Recommendations</h6>
+                                <ul class="list-unstyled mb-0">
+                                    <li><i class="bi bi-lightbulb text-info me-2"></i>Enhance online presence</li>
+                                    <li><i class="bi bi-lightbulb text-info me-2"></i>Regular surveys</li>
+                                    <li><i class="bi bi-lightbulb text-info me-2"></i>Third-party verification</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Trust Gauge Chart
+    const gaugeCtx = document.getElementById('trustGauge').getContext('2d');
+    new Chart(gaugeCtx, {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [85.2, 14.8],
+                backgroundColor: ['#4facfe', '#e9ecef'],
+                borderWidth: 0,
+                cutout: '70%'
+            }]
+        },
+        options: {
+            responsive: false,
+            plugins: { legend: { display: false } }
+        }
+    });
+
+    // Trust Trend Chart
+    const trendCtx = document.getElementById('trustTrendChart').getContext('2d');
+    new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: ['2019', '2020', '2021', '2022', '2023'],
+            datasets: [{
+                label: 'Trust Score',
+                data: [72.5, 76.8, 79.2, 82.1, 85.2],
+                borderColor: '#4facfe',
+                backgroundColor: 'rgba(79, 172, 254, 0.1)',
+                borderWidth: 3,
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: false, min: 70, max: 90 }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

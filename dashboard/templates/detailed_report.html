@@ -1,0 +1,729 @@
+{% extends "base.html" %}
+
+{% block title %}Detailed Performance Report - UGC-AICTE Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+.report-header {
+    background: linear-gradient(135deg, #002D62 0%, #0088cc 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+}
+
+.metric-card {
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    border: 1px solid #e9ecef;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.metric-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    border-color: #007bff;
+}
+
+.metric-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #007bff;
+}
+
+.metric-label {
+    color: #6c757d;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.chart-container {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.insight-card {
+    background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%);
+    border: 1px solid #2196f3;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.recommendation-item {
+    background: linear-gradient(135deg, #f1f8e9 0%, #ffffff 100%);
+    border: 1px solid #4caf50;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: start;
+}
+
+.recommendation-item i {
+    color: #4caf50;
+    font-size: 1.2rem;
+    margin-right: 12px;
+    margin-top: 3px;
+}
+
+.performance-legend {
+    padding: 15px;
+}
+
+.legend-item {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 12px;
+    border-left: 4px solid #007bff;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.legend-value {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #495057;
+}
+
+.legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: inline-block;
+}
+
+.metric-summary-item {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 8px;
+    margin: 5px;
+    border: 1px solid #e9ecef;
+}
+
+.metrics-comparison-wrapper {
+    position: relative;
+    height: 280px;
+    max-width: 100%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+.metrics-comparison-wrapper canvas {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+.performance-gauge {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+}
+
+.gauge-score {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.gauge-score .score {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: #002D62;
+}
+
+.gauge-score .label {
+    font-size: 0.9rem;
+    color: #6c757d;
+    text-transform: uppercase;
+}
+
+.comparison-bar {
+    height: 30px;
+    background: #e9ecef;
+    border-radius: 15px;
+    overflow: hidden;
+    position: relative;
+    margin: 10px 0;
+}
+
+.comparison-fill {
+    height: 100%;
+    border-radius: 15px;
+    transition: width 1s ease-in-out;
+}
+
+.comparison-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: 600;
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.section-divider {
+    border: none;
+    height: 2px;
+    background: linear-gradient(90deg, #007bff, transparent);
+    margin: 3rem 0;
+}
+
+@media print {
+    .btn, .navbar, .breadcrumb {
+        display: none !important;
+    }
+    
+    .report-header {
+        background: #002D62 !important;
+        -webkit-print-color-adjust: exact;
+    }
+    
+    .chart-container {
+        page-break-inside: avoid;
+    }
+}
+</style>
+{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{{ url_for('index') }}">Dashboard</a></li>
+<li class="breadcrumb-item active" aria-current="page">Detailed Report</li>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Report Header -->
+    <div class="report-header">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <h1 class="mb-3">
+                    <i class="bi bi-file-earmark-bar-graph me-3"></i>
+                    Institutional Performance Analysis Report
+                </h1>
+                <p class="mb-0 fs-5 opacity-90">Comprehensive AI-powered assessment and recommendations</p>
+                <div class="mt-3">
+                    <span class="badge bg-light text-dark fs-6 me-2">
+                        <i class="bi bi-calendar me-1"></i>Generated: {{ timestamp.strftime('%B %d, %Y') if timestamp else 'N/A' }}
+                    </span>
+                    <span class="badge bg-light text-dark fs-6">
+                        <i class="bi bi-clock me-1"></i>{{ timestamp.strftime('%I:%M %p') if timestamp else 'N/A' }}
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="d-flex flex-column gap-2">
+                    <button class="btn btn-light btn-lg" onclick="window.print()">
+                        <i class="bi bi-printer me-2"></i>Print Report
+                    </button>
+                    <button class="btn btn-outline-light btn-lg" onclick="downloadPDF()">
+                        <i class="bi bi-download me-2"></i>Download PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Overview -->
+    <div class="row mb-4">
+        <div class="col-lg-4 mb-3">
+            <div class="metric-card text-center">
+                <div class="performance-gauge">
+                    <canvas id="overallGauge" width="200" height="200"></canvas>
+                    <div class="gauge-score">
+                        <div class="score" id="overallScore">{{ prediction.performance_index if prediction else '--' }}</div>
+                        <div class="label">Overall Score</div>
+                    </div>
+                </div>
+                <h5 class="mt-3 text-{{ prediction.level_color if prediction else 'secondary' }}">
+                    {{ prediction.performance_level if prediction else 'No Data' }}
+                </h5>
+                <p class="text-muted small">{{ prediction.level_description if prediction else 'Run a prediction to see results' }}</p>
+            </div>
+        </div>
+        
+        <div class="col-lg-8">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="metric-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="metric-label">AICTE Score</div>
+                                <div class="metric-value">{{ (input_data.AICTE_Approval_Score or input_data.aicte_score) if input_data else '--' }}</div>
+                            </div>
+                            <i class="bi bi-award text-primary" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="metric-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="metric-label">UGC Rating</div>
+                                <div class="metric-value">{{ (input_data.UGC_Rating or input_data.ugc_rating) if input_data else '--' }}/10</div>
+                            </div>
+                            <i class="bi bi-star text-warning" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="metric-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="metric-label">NIRF Rank</div>
+                                <div class="metric-value">{{ (input_data.NIRF_Rank or input_data.nirf_rank) if input_data else '--' }}</div>
+                            </div>
+                            <i class="bi bi-trophy text-success" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="metric-card">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <div class="metric-label">Placement Rate</div>
+                                <div class="metric-value">{{ (input_data.Placement_Percentage or input_data.placement_percentage) if input_data else '--' }}%</div>
+                            </div>
+                            <i class="bi bi-briefcase text-info" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- Performance Analysis Charts -->
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-3">
+            <div class="chart-container h-100 d-flex flex-column">
+                <h5 class="mb-3">
+                    <i class="bi bi-bar-chart-fill text-primary me-2"></i>
+                    Performance Metrics Comparison
+                </h5>
+                <div class="metrics-comparison-wrapper flex-grow-1 d-flex flex-column justify-content-center">
+                    <canvas id="metricsComparisonChart" width="350" height="350"></canvas>
+                </div>
+                <div class="mt-3">
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <div class="metric-summary-item">
+                                <div class="d-flex align-items-center justify-content-center mb-1">
+                                    <div class="legend-dot" style="background-color: rgba(13, 110, 253, 1);"></div>
+                                    <span class="ms-2 fw-bold small">Your Institution</span>
+                                </div>
+                                <small class="text-muted">Current Performance</small>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="metric-summary-item">
+                                <div class="d-flex align-items-center justify-content-center mb-1">
+                                    <div class="legend-dot" style="background-color: rgba(40, 167, 69, 0.8);"></div>
+                                    <span class="ms-2 fw-bold small">National Average</span>
+                                </div>
+                                <small class="text-muted">Benchmark Comparison</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6 mb-3">
+            <div class="chart-container h-100 d-flex flex-column">
+                <h5 class="mb-4">
+                    <i class="bi bi-pie-chart text-info me-2"></i>
+                    Performance Distribution Analysis
+                </h5>
+                <div class="row flex-grow-1">
+                    <div class="col-md-7">
+                        <div class="d-flex align-items-center justify-content-center h-100">
+                            <canvas id="performanceDistributionChart" width="280" height="280"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-5">
+                        <div class="performance-legend h-100 d-flex flex-column justify-content-center">
+                            <div class="legend-item mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="legend-color bg-success me-2"></div>
+                                    <span class="fw-bold">Your Score</span>
+                                </div>
+                                <div class="legend-value">{{ prediction.performance_index|round(1) if prediction else 66.2 }}/100</div>
+                            </div>
+                            <div class="legend-item mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="legend-color bg-primary me-2"></div>
+                                    <span class="fw-bold">National Average</span>
+                                </div>
+                                <div class="legend-value">76.5/100</div>
+                            </div>
+                            <div class="legend-item mb-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="legend-color bg-warning me-2"></div>
+                                    <span class="fw-bold">Top 25% Threshold</span>
+                                </div>
+                                <div class="legend-value">85.2/100</div>
+                            </div>
+                            <div class="legend-item">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="legend-color bg-info me-2"></div>
+                                    <span class="fw-bold">Excellence Level</span>
+                                </div>
+                                <div class="legend-value">92.0+/100</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Breakdown -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="chart-container">
+                <h5 class="mb-3">
+                    <i class="bi bi-speedometer2 text-warning me-2"></i>
+                    Detailed Performance Breakdown
+                </h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Academic Excellence</h6>
+                        <div class="comparison-bar">
+                            {% set ugc_value = (input_data.UGC_Rating or input_data.ugc_rating or 7)|float %}
+                            {% set ugc_percent = (ugc_value * 10)|round(1) %}
+                            <div class="comparison-fill bg-success" style="width: {{ ugc_percent }}%"></div>
+                            <div class="comparison-label">{{ ugc_percent }}%</div>
+                        </div>
+                        
+                        <h6 class="mt-3">Research Impact</h6>
+                        <div class="comparison-bar">
+                            {% set research_value = (input_data.Research_Projects or input_data.research_projects or 10)|float %}
+                            {% set research_percent = (research_value * 2)|round(1) %}
+                            <div class="comparison-fill bg-info" style="width: {{ research_percent }}%"></div>
+                            <div class="comparison-label">{{ research_percent }}%</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Industry Connect</h6>
+                        <div class="comparison-bar">
+                            {% set placement_value = (input_data.Placement_Percentage or input_data.placement_percentage or 70) %}
+                            <div class="comparison-fill bg-primary" style="width: {{ placement_value }}%"></div>
+                            <div class="comparison-label">{{ placement_value }}%</div>
+                        </div>
+                        
+                        <h6 class="mt-3">Infrastructure Quality</h6>
+                        <div class="comparison-bar">
+                            {% set infra_value = (input_data.Infrastructure_Score or input_data.infrastructure_score or 7.5)|float %}
+                            {% set infra_percent = (infra_value * 10)|round(1) %}
+                            <div class="comparison-fill bg-warning" style="width: {{ infra_percent }}%"></div>
+                            <div class="comparison-label">{{ infra_value }}%</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="section-divider">
+
+    <!-- AI Insights Section -->
+    {% if recommendations %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="insight-card">
+                <h5 class="mb-3">
+                    <i class="bi bi-robot text-primary me-2"></i>
+                    AI-Generated Insights & Recommendations
+                </h5>
+                <div class="row">
+                    {% for recommendation in recommendations %}
+                    <div class="col-md-6 mb-3">
+                        <div class="recommendation-item">
+                            <i class="bi bi-lightbulb"></i>
+                            <span>{{ recommendation }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Tier Classification -->
+    <div class="row mb-4">
+        <div class="col-lg-6 mb-3">
+            <div class="chart-container">
+                <h5 class="mb-3">
+                    <i class="bi bi-layers text-info me-2"></i>
+                    Institutional Tier Classification
+                </h5>
+                <div class="tier-classification">
+                    {% set performance_score = prediction.performance_index if prediction else 0 %}
+                    {% if performance_score >= 85 %}
+                        <div class="alert alert-success">
+                            <h6><i class="bi bi-award me-2"></i>Tier 1 Institution</h6>
+                            <p class="mb-0">Elite category with exceptional performance across all metrics</p>
+                        </div>
+                    {% elif performance_score >= 70 %}
+                        <div class="alert alert-info">
+                            <h6><i class="bi bi-star me-2"></i>Tier 2 Institution</h6>
+                            <p class="mb-0">Strong performance with good potential for improvement</p>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-warning">
+                            <h6><i class="bi bi-building me-2"></i>Tier 3 Institution</h6>
+                            <p class="mb-0">Developing institution with significant improvement opportunities</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-6 mb-3">
+            <div class="chart-container">
+                <h5 class="mb-3">
+                    <i class="bi bi-clipboard-data text-secondary me-2"></i>
+                    Action Items
+                </h5>
+                <div class="action-items">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            Review and update curriculum based on industry needs
+                        </div>
+                        <div class="list-group-item">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            Enhance faculty development programs
+                        </div>
+                        <div class="list-group-item">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            Strengthen industry partnerships
+                        </div>
+                        <div class="list-group-item">
+                            <i class="bi bi-check-circle text-success me-2"></i>
+                            Invest in research infrastructure
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Report Footer -->
+    <div class="row">
+        <div class="col-12">
+            <div class="text-center p-4 bg-light rounded">
+                <p class="text-muted mb-2">Report generated on {{ timestamp.strftime('%B %d, %Y at %I:%M %p') if timestamp else 'N/A' }}</p>
+                <p class="text-muted mb-0">
+                    <i class="bi bi-shield-check me-1"></i>
+                    Powered by UGC-AICTE Institutional Performance Portal
+                </p>
+                <div class="mt-3">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary me-2">
+                        <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
+                    </a>
+                    <a href="{{ url_for('results') }}" class="btn btn-outline-secondary">
+                        <i class="bi bi-graph-up me-1"></i>View Interactive Results
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+// Chart data
+const predictionData = {{ prediction | tojson if prediction else '{}' }};
+const inputData = {{ input_data | tojson if input_data else '{}' }};
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (Object.keys(predictionData).length > 0 && Object.keys(inputData).length > 0) {
+        createOverallGauge();
+        createMetricsComparisonChart();
+        createPerformanceDistributionChart();
+    } else {
+        showNoDataMessage();
+    }
+});
+
+function createOverallGauge() {
+    const ctx = document.getElementById('overallGauge').getContext('2d');
+    const score = predictionData.performance_index || 0;
+    
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [score, 100 - score],
+                backgroundColor: [getScoreColor(score), '#e9ecef'],
+                borderWidth: 0,
+                cutout: '70%'
+            }]
+        },
+        options: {
+            responsive: false,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: false }
+            }
+        }
+    });
+}
+
+function createMetricsComparisonChart() {
+    const ctx = document.getElementById('metricsComparisonChart').getContext('2d');
+    
+    // Helper function to get field value with fallback
+    function getFieldValue(field1, field2, defaultValue = 0) {
+        return inputData[field1] || inputData[field2] || defaultValue;
+    }
+    
+    // Prepare user data with field name fallbacks
+    const userData = [
+        getFieldValue('AICTE_Approval_Score', 'aicte_score', 75),
+        getFieldValue('UGC_Rating', 'ugc_rating', 7) * 10,
+        Math.max(0, 100 - ((getFieldValue('NIRF_Rank', 'nirf_rank', 50)) / 2)),
+        getFieldValue('Placement_Percentage', 'placement_percentage', 70),
+        getFieldValue('Research_Projects', 'research_projects', 15) * 2,
+        getFieldValue('Infrastructure_Score', 'infrastructure_score', 7.5) * 10
+    ];
+    
+    // National averages for comparison
+    const nationalAverage = [78, 74, 75, 73, 30, 75];
+    
+    new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['AICTE Score', 'UGC Rating', 'NIRF Position', 'Placement %', 'Research Projects', 'Infrastructure'],
+            datasets: [{
+                label: 'Your Institution',
+                data: userData,
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 2,
+                pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5
+            }, {
+                label: 'National Average',
+                data: nationalAverage,
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 2,
+                pointBackgroundColor: 'rgba(255, 99, 132, 1)',
+                pointBorderColor: '#fff',
+                pointBorderWidth: 2,
+                pointRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 1,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom'
+                }
+            },
+            scales: {
+                r: {
+                    beginAtZero: true,
+                    max: 100,
+                    ticks: {
+                        stepSize: 20
+                    }
+                }
+            }
+        }
+    });
+}
+
+function createPerformanceDistributionChart() {
+    const ctx = document.getElementById('performanceDistributionChart').getContext('2d');
+    
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Excellent', 'Very Good', 'Good', 'Average', 'Needs Improvement'],
+            datasets: [{
+                data: [45, 62, 38, 28, 15],
+                backgroundColor: [
+                    '#28a745',
+                    '#17a2b8', 
+                    '#007bff',
+                    '#ffc107',
+                    '#dc3545'
+                ],
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            aspectRatio: 1,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((context.parsed / total) * 100).toFixed(1);
+                            return context.label + ': ' + context.parsed + ' institutions (' + percentage + '%)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function getScoreColor(score) {
+    if (score >= 85) return '#28a745';
+    if (score >= 75) return '#17a2b8';
+    if (score >= 65) return '#007bff';
+    if (score >= 55) return '#ffc107';
+    return '#dc3545';
+}
+
+function showNoDataMessage() {
+    document.getElementById('overallScore').textContent = '--';
+    console.log('No data available for charts');
+}
+
+function downloadPDF() {
+    window.print();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}UGC-AICTE Institutional Performance Portal{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Header -->
+    <header class="gov-header">
+        <div class="container-fluid">
+            <div class="row align-items-center py-3">
+                <div class="col-md-2 text-center">
+                    <img src="{{ url_for('static', filename='images/gov_logo.png') }}" 
+                         alt="Government of India" 
+                         class="gov-logo"
+                         onerror="this.style.display='none'">
+                    <div class="emblem-placeholder">
+                        <img src="https://hrdc.mu.ac.in/images/logo/UGC_India_Logo.png" 
+                             alt="UGC India" 
+                             style="width: 70px; height: 70px;"
+                             onerror="this.innerHTML='<i class=\'bi bi-shield-check text-primary\' style=\'font-size: 3rem;\'></i>'">
+                    </div>
+                </div>
+                <div class="col-md-8 text-center">
+                    <h1 class="gov-title mb-1">Government of India</h1>
+                    <h2 class="portal-title mb-1">UGC-AICTE Institutional Performance Portal</h2>
+                    <p class="subtitle mb-0">Ministry of Education | Digital India Initiative</p>
+                </div>
+                <div class="col-md-2 text-center">
+                    <div class="digital-india-logo">
+                        <img src="https://upload.wikimedia.org/wikipedia/en/e/eb/All_India_Council_for_Technical_Education_logo.png" 
+                             alt="AICTE" 
+                             style="width: 60px; height: 60px;"
+                             onerror="this.innerHTML='<i class=\'bi bi-cpu text-info\' style=\'font-size: 2.5rem;\'></i>'">
+                        <small class="d-block text-muted mt-1">AICTE</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg gov-navbar">
+        <div class="container">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" 
+                           href="{{ url_for('index') }}">
+                            <i class="bi bi-house-door"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="analyticsDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-graph-up"></i> Performance Analytics
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('index') }}#prediction">
+                                <i class="bi bi-cpu"></i> AI Predictor</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('reports') }}">
+                                <i class="bi bi-bar-chart"></i> Institution Reports</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('comparative_analysis') }}">
+                                <i class="bi bi-diagram-3"></i> Comparative Analysis</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('leaderboard') }}">
+                                <i class="bi bi-trophy"></i> Leaderboard</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="analyticsDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-graph-up"></i> Analytics & Reports
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="{{ url_for('heatmap') }}">
+                                <i class="bi bi-grid-fill"></i> Performance Heatmap</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('generate_report') }}">
+                                <i class="bi bi-file-earmark-text"></i> AI Report Generation</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('ai_recommendations') }}">
+                                <i class="bi bi-lightbulb"></i> AI Recommendations</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('trust_index') }}">
+                                <i class="bi bi-shield-check"></i> Trust Index</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('risk_assessment') }}">
+                                <i class="bi bi-exclamation-triangle"></i> Risk Assessment</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="dataDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-database"></i> Institution Data
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="showDatasetExplorer()">
+                                <i class="bi bi-table"></i> Dataset Explorer</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('upload_dataset') }}">
+                                <i class="bi bi-upload"></i> Upload Dataset</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('quality_assistant') }}">
+                                <i class="bi bi-tools"></i> Data Quality Assistant</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('roadmap') }}">
+                                <i class="bi bi-map"></i> Improvement Roadmap</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('quality_assistant') }}">
+                                <i class="bi bi-robot"></i> Quality Assistant</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="complianceDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-shield-check"></i> Compliance & Verification
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="showBlockchainVerification()">
+                                <i class="bi bi-shield-lock"></i> Document Verification</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="showComplianceTracker()">
+                                <i class="bi bi-check-square"></i> Compliance Tracker</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="showDigitalParticipation()">
+                                <i class="bi bi-globe"></i> Digital Participation Index</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="decisionDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-lightbulb"></i> Decision Support
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="showRecommendationEngine()">
+                                <i class="bi bi-robot"></i> AI Recommendations</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="showTrustIndex()">
+                                <i class="bi bi-award"></i> Institution Trust Index</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="showRiskHeatmap()">
+                                <i class="bi bi-thermometer-half"></i> Risk Heatmap</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="reportsDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-file-earmark-text"></i> Reports & Insights
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="generateAIReport()">
+                                <i class="bi bi-file-pdf"></i> Generate AI Report</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="downloadInstitutionSummary()">
+                                <i class="bi bi-download"></i> Institution Summary</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="exportPerformanceData()">
+                                <i class="bi bi-table"></i> Performance Export</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="generateAutomatedFeedback()">
+                                <i class="bi bi-chat-text"></i> Automated Feedback</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">
+                            <i class="bi bi-person-circle"></i> Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <span class="nav-link">
+                            <i class="bi bi-clock"></i> 
+                            <span id="current-time"></span>
+                        </span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Breadcrumb -->
+    {% block breadcrumb %}
+    <nav aria-label="breadcrumb" class="breadcrumb-section">
+        <div class="container">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Home</a></li>
+                {% block breadcrumb_items %}{% endblock %}
+            </ol>
+        </div>
+    </nav>
+    {% endblock %}
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="gov-footer">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6 class="footer-title">Contact Information</h6>
+                    <p class="mb-1">
+                        <i class="bi bi-envelope"></i> 
+                        Email: support@ugc-aicte-portal.gov.in
+                    </p>
+                    <p class="mb-1">
+                        <i class="bi bi-telephone"></i> 
+                        Helpline: 1800-XXX-XXXX
+                    </p>
+                    <p class="mb-0">
+                        <i class="bi bi-geo-alt"></i> 
+                        Ministry of Education, Shastri Bhawan, New Delhi
+                    </p>
+                </div>
+                <div class="col-md-3">
+                    <h6 class="footer-title">Quick Links</h6>
+                    <ul class="footer-links">
+                        <li><a href="https://www.ugc.ac.in" target="_blank">UGC Official Website</a></li>
+                        <li><a href="https://www.aicte-india.org" target="_blank">AICTE Official Website</a></li>
+                        <li><a href="https://www.nirfindia.org" target="_blank">NIRF Rankings</a></li>
+                        <li><a href="https://www.digitalindia.gov.in" target="_blank">Digital India</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h6 class="footer-title">Policies</h6>
+                    <ul class="footer-links">
+                        <li><a href="#" data-bs-toggle="modal" data-bs-target="#privacyModal">Privacy Policy</a></li>
+                        <li><a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms of Use</a></li>
+                        <li><a href="#">Accessibility</a></li>
+                        <li><a href="#">RTI</a></li>
+                    </ul>
+                </div>
+            </div>
+            <hr class="footer-divider">
+            <div class="row">
+                <div class="col-md-8">
+                    <p class="copyright mb-0">
+                        © 2024 Ministry of Education, Government of India | 
+                        UGC-AICTE Data Analytics Wing | 
+                        Powered by AI & Machine Learning
+                    </p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <p class="mb-0">
+                        <small>Last Updated: <span id="last-updated"></span></small>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <!-- About Modal -->
+    <div class="modal fade" id="aboutModal" tabindex="-1" aria-labelledby="aboutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="aboutModalLabel">About UGC-AICTE Performance Portal</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>Mission</h6>
+                    <p>To provide AI-driven insights for institutional performance assessment and improvement recommendations for higher education institutions in India.</p>
+                    
+                    <h6>Features</h6>
+                    <ul>
+                        <li>Performance prediction based on institutional metrics</li>
+                        <li>Historical data analysis and trending</li>
+                        <li>Comparative institutional analysis</li>
+                        <li>Improvement recommendations</li>
+                    </ul>
+                    
+                    <h6>Data Sources</h6>
+                    <p>This portal uses synthetic data for demonstration purposes. In production, it would integrate with official UGC, AICTE, and NIRF databases.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="loginModalLabel">Official Login</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle"></i>
+                        This is a demonstration portal. In production, this would integrate with official government authentication systems.
+                    </div>
+                    <form>
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Official ID</label>
+                            <input type="text" class="form-control" id="username" placeholder="Enter your official ID">
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" placeholder="Enter password">
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="rememberMe">
+                            <label class="form-check-label" for="rememberMe">Remember me</label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary">Login with DigiLocker</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Modal -->
+    <div class="modal fade" id="privacyModal" tabindex="-1" aria-labelledby="privacyModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="privacyModalLabel">Privacy Policy</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>This privacy policy outlines how the UGC-AICTE Institutional Performance Portal handles user data and institutional information.</p>
+                    <h6>Data Collection</h6>
+                    <p>We collect only necessary institutional performance metrics for analysis and prediction purposes.</p>
+                    <h6>Data Security</h6>
+                    <p>All data is secured using government-standard encryption and security protocols.</p>
+                    <h6>Data Usage</h6>
+                    <p>Data is used solely for institutional performance analysis and improvement recommendations.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Terms Modal -->
+    <div class="modal fade" id="termsModal" tabindex="-1" aria-labelledby="termsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="termsModalLabel">Terms of Use</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>By using the UGC-AICTE Institutional Performance Portal, you agree to the following terms:</p>
+                    <ul>
+                        <li>Use the portal only for legitimate educational and institutional purposes</li>
+                        <li>Provide accurate information when submitting data</li>
+                        <li>Respect the intellectual property rights of the portal</li>
+                        <li>Comply with all applicable laws and regulations</li>
+                    </ul>
+                    <p>The Government of India reserves the right to modify these terms at any time.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- jQuery (required for Select2 and other components) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>
