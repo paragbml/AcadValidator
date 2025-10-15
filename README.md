@@ -7,8 +7,12 @@ A comprehensive AI-driven platform that analyzes historical data of higher educa
 ![Flask](https://img.shields.io/badge/flask-2.0+-red.svg)
 ![ML](https://img.shields.io/badge/ML-scikit--learn-orange.svg)
 
-## 🌟 Features
+Images
+<img width="2558" height="1437" alt="Screenshot 2025-10-15 150040" src="https://github.com/user-attachments/assets/729039e9-2a06-4e96-9c6e-99cb245d24f1" />
 
+
+
+## 🌟 Features
 ### 🤖 AI-Powered Analysis
 - **Performance Prediction**: RandomForest-based ML model with 89%+ accuracy
 - **Trend Analysis**: Historical performance tracking (2019-2023)
